@@ -17,6 +17,17 @@ import antlr.collections.impl.BitSet;
 public class MyParser extends antlr.LLkParser       implements MyParserTokenTypes
  {
 
+   private Program  program;
+   private Command  command;
+   private int      writeType;
+   private String   element;
+   private Stack    stack;
+
+   public void init(){
+       program = new Program();
+       stack   = new Stack();
+   }
+
 protected MyParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
   tokenNames = _tokenNames;
@@ -46,10 +57,16 @@ public MyParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(LITERAL_program);
 			match(ID);
+			
+			program.className = LT(0).getText();
+			
 			match(EQUALS);
 			match(AC);
 			body();
 			match(FC);
+			
+			System.out.println(program.writeJava());
+			
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -115,12 +132,24 @@ public MyParser(ParserSharedInputState state) {
 			}
 			}
 			match(ID);
+			
+			command = new decCommand();
+			if(LT(-1).getText().equals("String")){
+			((decCommand)command).changeMode(decCommand.TYPE_STRING);
+			} else {
+			((decCommand)command).changeMode(decCommand.TYPE_NUMBER);
+			}
+			((decCommand)command).addVariable(LT(0).getText());
+			
 			{
 			_loop10:
 			do {
 				if ((LA(1)==COMMA)) {
 					match(COMMA);
 					match(ID);
+					
+					((decCommand)command).addVariable(LT(0).getText());
+					
 				}
 				else {
 					break _loop10;
@@ -129,6 +158,9 @@ public MyParser(ParserSharedInputState state) {
 			} while (true);
 			}
 			match(HT);
+			
+			program.addCommand(command);
+			
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);

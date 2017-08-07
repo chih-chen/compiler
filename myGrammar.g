@@ -1,11 +1,45 @@
 // **************************** PARSER RULES *****************************
 class MyParser extends Parser;
 
-program: "program" ID EQUALS AC body FC ;
+{
+   private Program  program;
+   private Command  command;
+   private int      writeType;
+   private String   element;
+   private Stack    stack;
+
+   public void init(){
+       program = new Program();
+       stack   = new Stack();
+   }
+}
+
+program: "program" ID { 
+                        program.className = LT(0).getText();
+                      } 
+          EQUALS AC body FC {  
+                              System.out.println(program.writeJava());
+                            }
+        ;
 
 body: (declaration)* (statment)* ;
 
-declaration: ("String" | "Number") ID (COMMA ID)* HT ;  
+declaration: ("String" | "Number") ID { 
+                                        command = new decCommand();
+                                        if(LT(-1).getText().equals("String")){
+                                          ((decCommand)command).changeMode(decCommand.TYPE_STRING);
+                                        } else {
+                                          ((decCommand)command).changeMode(decCommand.TYPE_NUMBER);
+                                        }
+                                        ((decCommand)command).addVariable(LT(0).getText());
+                                      }
+              (COMMA ID {
+                          ((decCommand)command).addVariable(LT(0).getText());
+                        }
+              )* HT {
+                      program.addCommand(command);
+                    }
+            ;  
 
 statment: ifStatment | whileStatment | assignmentStatement | ioStatment ;
 
@@ -50,7 +84,7 @@ COMMENT : "//" (~('\n'|'\r'))* {$setType(Token.SKIP);} ;
 
 NUM     : ('0'..'9')+ ('.' ('0'..'9')+ )? ;
         
-STRING  : '"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"' ;
+STRING  : '"' ('a'..'z' | 'A'..'Z' | ' ' | '?' | '!' | '#' |'(' | ')' | '0'..'9')* '"' ;
 
 //PRINT : "puts" ;  READ : "read" ;                             this causes nondeterminism
 
