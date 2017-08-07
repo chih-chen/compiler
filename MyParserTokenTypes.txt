@@ -1,0 +1,30 @@
+// $ANTLR 2.7.6 (2005-12-22): myGrammar.g -> MyParserTokenTypes.txt$
+MyParser    // output token vocab name
+LITERAL_program="program"=4
+ID=5
+EQUALS=6
+AB=7
+FC=8
+TYPE=9
+HT=10
+COMMA=11
+IF=12
+AP=13
+FP=14
+AC=15
+ELSE=16
+WHILE=17
+READ=18
+PRINT=19
+PLUS=20
+MINUS=21
+TIMES=22
+DIV=23
+LT=24
+LTE=25
+GT=26
+GTE=27
+WS=28
+COMMENT=29
+NUM=30
+STRING=31
