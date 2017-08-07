@@ -2,27 +2,13 @@ program MyProgram = {
   Number x, y, z#
   String a, b, c#
   
-  read(x)#
-  read(y)#
-  z = 10.2#
+  x = 10#
+  y = 20#
+  z = 3.2#
   
-  puts(x+y+z)#
-  puts(x-y-z)#
-  puts(x*y*z)#
-  puts(x/y/z)#
-  
-  se() {
-  
-  } do contrario {
-    
-  }
-  
-  enquanto() {
-  
-  }
-  
-  
-  
+  a = "Ola"#
+  b = "Tudo bem?"#
+  c = "estou bem!"#
   
   
 }
