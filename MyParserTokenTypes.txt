@@ -1,0 +1,26 @@
+// $ANTLR 2.7.6 (2005-12-22): gram.g -> MyParserTokenTypes.txt$
+MyParser    // output token vocab name
+LITERAL_programa="programa"=4
+LITERAL_fimprog="fimprog"=5
+LITERAL_declare="declare"=6
+ID=7
+VIRG=8
+DP=9
+LITERAL_inteiro="inteiro"=10
+LITERAL_real="real"=11
+LITERAL_texto="texto"=12
+PF=13
+LITERAL_inicio="inicio"=14
+LITERAL_fim="fim"=15
+IGUAL=16
+OP=17
+NUMINT=18
+NUMPF=19
+STRING=20
+ABRECHAVE=21
+LITERAL_funcao="funcao"=22
+FECHACHAVE=23
+WS=24
+AP=25
+FP=26
+ASPAS=27

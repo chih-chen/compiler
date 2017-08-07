@@ -1,0 +1,19 @@
+programa
+   declare a, b, c : inteiro.
+   declare e, f, g : real.
+   declare h, i, j : texto.
+   
+   inicio
+       a + b
+       {funcao a
+         declare a, z : real.
+         inicio
+         d = a
+         a + a
+         b
+         fim
+       }
+       a
+   fim
+fimprog
+
