@@ -1,38 +1,33 @@
+// **************************** PARSER RULES *****************************
 class MyParser extends Parser;
 
-program: "program" ID EQUALS AB body FC ;
+program: "program" ID EQUALS AC body FC ;
 
 body: (declaration)* (statment)* ;
 
-declaration: varDecl ;  
+declaration: TYPE ID (COMMA ID)* HT ;  
 
-varDecl: TYPE idList HT ; 
+statment: ifStatment | whileStatment | assignmentStatement | ioStatment | (expression HT);
 
-idList: ID (COMMA ID)* ;
-
-statment: ifStatment | whileStatment | assignmentStatement | ioStatment ;
-
-varReference: ID ;
-
-assignmentStatement: varReference EQUALS expression HT ;
+assignmentStatement: ID EQUALS (expression|NUM|STRING) HT ;
 
 ifStatment: IF AP expression FP AC (statment)* FC 
             (ELSE AC (statment)* FC)? ;
 
 whileStatment: WHILE AP expression FP AB (statment)* FC ;
 
-ioStatment: READ AP varReference FP HT |
+ioStatment: READ AP ID FP HT |
             PRINT AP expression FP HT ;
 
-innerElement: varReference | AP expression FP ;
+innerElement: ID | AP expression FP ;
 
 signExpression: ((PLUS|MINUS))* innerElement ;
 
 multiplyExpression: signExpression ((TIMES|DIV) signExpression)* ;
 
-addExpression: multiplyExpression ((PLUS|MINUS) multiplyExpression)* ;
+expression: multiplyExpression ((PLUS|MINUS) multiplyExpression)* ;
 
-expression: addExpression ((EQUALS|LT|LTE|GT|GTE) addExpression)* ;
+// **************************** LEXER RULES *****************************
 
 class MyLexer extends Lexer;
 
@@ -58,42 +53,11 @@ NUM     : ('0'..'9')+ ('.' ('0'..'9')+ )? ;
         
 STRING  : '"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"' ;
 
-PRINT   : "puts" ;
+PRINT : "puts" ;  READ : "read" ;
 
-READ    : "read" ;
+IF : "se" ;  ELSE : "do contrario" ;  WHILE   : "enquanto" ;
 
-IF      : "se" ;
-
-ELSE    : "do contrario" ;
-
-WHILE   : "enquanto" ;
-
-AC      : '{' ;
-
-FC      : '}' ; 
-
-AP      : '(' ;
-        
-FP      : ')' ;
-        
-HT      : '#' ;
-
-COMMA   : ',' ;
-
-EQUALS  : '=' ;        
-
-LT      : '<' ;
-
-LTE     : "<=" ;
-
-GT      : '>' ;
-
-GTE     : ">=" ;
-
-PLUS    : '+' ;
-
-MINUS   : '-' ;
-
-TIMES   : '*' ;
-
-DIV     : '/' ;
+AC     : '{' ;   FC    : '}' ;   AP    : '('  ;   FP  : ')' ;
+HT     : '#' ;   COMMA : ',' ;
+EQUALS : '=' ;   LT    : '<' ;   LTE   : "<=" ;   GT  : '>' ;   GTE : ">=" ;  
+PLUS   : '+' ;   MINUS : '-' ;   TIMES : '*'  ;   DIV : '/' ;

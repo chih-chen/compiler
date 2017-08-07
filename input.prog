@@ -1,0 +1,28 @@
+program MyProgram = {
+  Number x, y, z#
+  String a, b, c#
+  
+  read(x)#
+  read(y)#
+  z = 10.2#
+  
+  puts(x+y+z)#
+  puts(x-y-z)#
+  puts(x*y*z)#
+  puts(x/y/z)#
+  
+  se() {
+  
+  } do contrario {
+    
+  }
+  
+  enquanto() {
+  
+  }
+  
+  
+  
+  
+  
+}
