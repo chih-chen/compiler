@@ -45,13 +45,60 @@ statment: ifStatment | whileStatment | assignmentStatement | ioStatment ;
 
 assignmentStatement: ID EQUALS (expression|NUM|STRING) HT ;
 
-ifStatment: "se" AP expression FP AC (statment)* FC 
-            ("do contrario" AC (statment)* FC)? ;
+ifStatment: "se" AP 
+                   (ID | NUM)  {element = LT(0).getText();  }  
+                    OPREL      {element += LT(0).getText(); }
+                   (ID | NUM)  {element += LT(0).getText(); }
+                { 
+                   command = new ifCommand();
+                   ((ifCommand)command).setLogicalExpr(element);
+                   stack.push(command);
+                }   
+                FP AC body FC
+                ("senao" AC
+                {
+                  ifCommand tmp = (ifCommand)stack.getTopElement();
+                  tmp.setMode(ifCommand.ELSE_MODE);
+                }
+                   body FC
+                ) ?
+                
+                {
+                    Command command = stack.pop();
+                    if (stack.isEmpty()){
+                        program.addCommand(command);
+                    }
+                    else{
+                        ifCommand tmp = (ifCommand)stack.getTopElement();
+                        tmp.addCommand(command);
+                    }
+                }
+                
+                
+        ;
 
 whileStatment: "enquanto" AP expression FP AB (statment)* FC ;
 
-ioStatment: "read" AP ID FP HT |
+ioStatment: readCommand |
             "puts" AP expression FP HT ;
+
+readCommand: "read" { command = new readCommand(); }
+             AP (ID) 
+             {
+               element = LT(0).getText();
+             } FP
+             HT
+             {
+                ((readCommand)command).setId(element);
+                if (stack.isEmpty()){
+                   program.addCommand(command);
+                }
+                else{
+                   Command tmp = stack.getTopElement();
+                   ((ifCommand)tmp).addCommand(command);
+                }
+             }
+        ;
 
 innerElement: ID | AP expression FP ;
 
@@ -95,5 +142,6 @@ ID      options {testLiterals=true;}                            // hash table
 
 AC     : '{' ;   FC    : '}' ;   AP    : '('  ;   FP  : ')' ;
 HT     : '#' ;   COMMA : ',' ;
-EQUALS : '=' ;   LT    : '<' ;   LTE   : "<=" ;   GT  : '>' ;   GTE : ">=" ;  
+OPREL  : '<' | "<=" | '>' | ">=" | "!=" | "|=";
+EQUALS : '=' ;
 PLUS   : '+' ;   MINUS : '-' ;   TIMES : '*'  ;   DIV : '/' ;
