@@ -9,6 +9,13 @@ program MyProgram = {
   a = "Ola"#
   b = "Tudo bem?"#
   c = "estou bem!"#
-  
+ 
+  se (x > 5){
+    read(x)#
+  }senao{
+    read(x)#
+    read(y)#
+    read(x)#
+  }
   
 }

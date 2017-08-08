@@ -188,8 +188,8 @@ public MyParser(ParserSharedInputState state) {
 				assignmentStatement();
 				break;
 			}
-			case LITERAL_read:
 			case LITERAL_puts:
+			case LITERAL_read:
 			{
 				ioStatment();
 				break;
@@ -212,40 +212,66 @@ public MyParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(LITERAL_se);
 			match(AP);
-			expression();
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			element = LT(0).getText();
+			match(OPREL);
+			element += LT(0).getText();
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			element += LT(0).getText();
+			
+			command = new ifCommand();
+			((ifCommand)command).setLogicalExpr(element);
+			stack.push(command);
+			
 			match(FP);
 			match(AC);
-			{
-			_loop16:
-			do {
-				if ((_tokenSet_1.member(LA(1)))) {
-					statment();
-				}
-				else {
-					break _loop16;
-				}
-				
-			} while (true);
-			}
+			body();
 			match(FC);
 			{
 			switch ( LA(1)) {
-			case 18:
+			case LITERAL_senao:
 			{
-				match(18);
+				match(LITERAL_senao);
 				match(AC);
-				{
-				_loop19:
-				do {
-					if ((_tokenSet_1.member(LA(1)))) {
-						statment();
-					}
-					else {
-						break _loop19;
-					}
-					
-				} while (true);
-				}
+				
+				ifCommand tmp = (ifCommand)stack.getTopElement();
+				tmp.setMode(ifCommand.ELSE_MODE);
+				
+				body();
 				match(FC);
 				break;
 			}
@@ -253,8 +279,8 @@ public MyParser(ParserSharedInputState state) {
 			case FC:
 			case LITERAL_se:
 			case LITERAL_enquanto:
-			case LITERAL_read:
 			case LITERAL_puts:
+			case LITERAL_read:
 			{
 				break;
 			}
@@ -264,6 +290,16 @@ public MyParser(ParserSharedInputState state) {
 			}
 			}
 			}
+			
+			Command command = stack.pop();
+			if (stack.isEmpty()){
+			program.addCommand(command);
+			}
+			else{
+			ifCommand tmp = (ifCommand)stack.getTopElement();
+			tmp.addCommand(command);
+			}
+			
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -281,13 +317,13 @@ public MyParser(ParserSharedInputState state) {
 			match(FP);
 			match(AB);
 			{
-			_loop22:
+			_loop20:
 			do {
 				if ((_tokenSet_1.member(LA(1)))) {
 					statment();
 				}
 				else {
-					break _loop22;
+					break _loop20;
 				}
 				
 			} while (true);
@@ -347,11 +383,7 @@ public MyParser(ParserSharedInputState state) {
 			switch ( LA(1)) {
 			case LITERAL_read:
 			{
-				match(LITERAL_read);
-				match(AP);
-				match(ID);
-				match(FP);
-				match(HT);
+				readCommand();
 				break;
 			}
 			case LITERAL_puts:
@@ -429,6 +461,38 @@ public MyParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_6);
+		}
+	}
+	
+	public final void readCommand() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			match(LITERAL_read);
+			command = new readCommand();
+			match(AP);
+			{
+			match(ID);
+			}
+			
+			element = LT(0).getText();
+			
+			match(FP);
+			match(HT);
+			
+			((readCommand)command).setId(element);
+			if (stack.isEmpty()){
+			program.addCommand(command);
+			}
+			else{
+			Command tmp = stack.getTopElement();
+			((ifCommand)tmp).addCommand(command);
+			}
+			
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_4);
 		}
 	}
 	
@@ -605,12 +669,13 @@ public MyParser(ParserSharedInputState state) {
 		"STRING",
 		"\"se\"",
 		"AP",
+		"OPREL",
 		"FP",
-		"\"do contrario\"",
+		"\"senao\"",
 		"\"enquanto\"",
 		"AB",
-		"\"read\"",
 		"\"puts\"",
+		"\"read\"",
 		"PLUS",
 		"MINUS",
 		"TIMES",
@@ -629,7 +694,7 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 6848544L, 0L};
+		long[] data = { 13664288L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
@@ -639,37 +704,37 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 6850336L, 0L};
+		long[] data = { 13666080L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 6848800L, 0L};
+		long[] data = { 13664544L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
 	private static final long[] mk_tokenSet_5() {
-		long[] data = { 2013265984L, 0L};
+		long[] data = { 4026531904L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 135168L, 0L};
+		long[] data = { 266240L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 2139230272L, 0L};
+		long[] data = { 4278456384L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
 	private static final long[] mk_tokenSet_8() {
-		long[] data = { 2038566976L, 0L};
+		long[] data = { 4077129792L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
 	private static final long[] mk_tokenSet_9() {
-		long[] data = { 2013401152L, 0L};
+		long[] data = { 4026798144L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
