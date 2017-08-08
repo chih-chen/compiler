@@ -17,16 +17,18 @@ import antlr.collections.impl.BitSet;
 public class MyParser extends antlr.LLkParser       implements MyParserTokenTypes
  {
 
-   private Program  program;
-   private Command  command;
-   private int      writeType;
-   private String   element;
-   private Stack    stack;
-
-   public void init(){
-       program = new Program();
-       stack   = new Stack();
-   }
+    private Program  program;
+    private Command  command;
+    private int      result;
+    private String   element;
+    private Stack    stack;
+    private StringBuilder sb;
+   
+    public void init(){
+      program = new Program();
+      stack   = new Stack();
+      sb = new StringBuilder();
+    }
 
 protected MyParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
@@ -193,7 +195,7 @@ public MyParser(ParserSharedInputState state) {
 				if ((LA(1)==ID) && (LA(2)==EQUALS)) {
 					assignmentStatement();
 				}
-				else if ((LA(1)==ID||LA(1)==AP||LA(1)==NUM) && (_tokenSet_4.member(LA(2)))) {
+				else if ((LA(1)==ID||LA(1)==NUM) && (_tokenSet_4.member(LA(2)))) {
 					expression();
 				}
 			else {
@@ -255,7 +257,6 @@ public MyParser(ParserSharedInputState state) {
 			case ID:
 			case FC:
 			case LITERAL_se:
-			case AP:
 			case LITERAL_enquanto:
 			case NUM:
 			case LITERAL_read:
@@ -348,12 +349,12 @@ public MyParser(ParserSharedInputState state) {
 			match(ID);
 			
 			element = LT(0).getText(); 
+			command = new assignCommand();
 			
 			match(EQUALS);
 			{
 			switch ( LA(1)) {
 			case ID:
-			case AP:
 			case NUM:
 			{
 				expression();
@@ -370,8 +371,24 @@ public MyParser(ParserSharedInputState state) {
 			}
 			}
 			}
-			System.out.println();
+			
+			if( !LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
+			((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
+			program.setNumberVarValue(element,10.1);// TODO 10.1 must be changed to result of calculation
+			((assignCommand)command).buildExpression(element, sb.toString());
+			sb.setLength(0);
+			} else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
+			((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
+			program.setStringVarValue(element,LT(0).getText());
+			((assignCommand)command).buildString(element,LT(0).getText());
+			} else {
+			throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
+			}
+			
 			match(HT);
+			
+			program.addCommand(command);
+			
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -400,7 +417,6 @@ public MyParser(ParserSharedInputState state) {
 				{
 				switch ( LA(1)) {
 				case ID:
-				case AP:
 				case NUM:
 				{
 					expression();
@@ -447,13 +463,13 @@ public MyParser(ParserSharedInputState state) {
 					case PLUS:
 					{
 						match(PLUS);
-						System.out.print(LT(0).getText());
+						sb.append(LT(0).getText()); /*System.out.print(LT(0).getText());*/
 						break;
 					}
 					case MINUS:
 					{
 						match(MINUS);
-						System.out.print(LT(0).getText());
+						sb.append(LT(0).getText());
 						break;
 					}
 					default:
@@ -491,13 +507,13 @@ public MyParser(ParserSharedInputState state) {
 					case TIMES:
 					{
 						match(TIMES);
-						System.out.print(LT(0).getText());
+						sb.append(LT(0).getText());
 						break;
 					}
 					case DIV:
 					{
 						match(DIV);
-						System.out.print(LT(0).getText());
+						sb.append(LT(0).getText());
 						break;
 					}
 					default:
@@ -529,22 +545,13 @@ public MyParser(ParserSharedInputState state) {
 			case NUM:
 			{
 				match(NUM);
-				System.out.print(LT(0).getText());
+				sb.append(LT(0).getText());
 				break;
 			}
 			case ID:
 			{
 				match(ID);
-				System.out.print(LT(0).getText());
-				break;
-			}
-			case AP:
-			{
-				match(AP);
-				System.out.print(LT(0).getText());
-				expression();
-				match(FP);
-				System.out.print(LT(0).getText());
+				sb.append(LT(0).getText());
 				break;
 			}
 			default:
@@ -599,7 +606,7 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 14204960L, 0L};
+		long[] data = { 14172192L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
@@ -609,32 +616,32 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 14206752L, 0L};
+		long[] data = { 14173984L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 265863456L, 0L};
+		long[] data = { 265830688L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
 	private static final long[] mk_tokenSet_5() {
-		long[] data = { 14205216L, 0L};
+		long[] data = { 14172448L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 14405920L, 0L};
+		long[] data = { 14373152L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 64737568L, 0L};
+		long[] data = { 64704800L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
 	private static final long[] mk_tokenSet_8() {
-		long[] data = { 266064160L, 0L};
+		long[] data = { 266031392L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());

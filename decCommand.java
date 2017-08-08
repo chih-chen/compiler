@@ -34,7 +34,7 @@ public class decCommand extends Command {
       }
     } else {
       for(String var: Program.numberVarList.keySet()){
-        str.append("float "+var+";\n");
+        str.append("double "+var+";\n");
       }
     }
     return str.toString();

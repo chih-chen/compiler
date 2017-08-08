@@ -2,20 +2,22 @@
 class MyParser extends Parser;
 
 options {
-   k = 2;                     // two characters of lookahead
+  k = 2;                     // two characters of lookahead
 }
 
 {
-   private Program  program;
-   private Command  command;
-   private int      writeType;
-   private String   element;
-   private Stack    stack;
-
-   public void init(){
-       program = new Program();
-       stack   = new Stack();
-   }
+    private Program  program;
+    private Command  command;
+    private int      result;
+    private String   element;
+    private Stack    stack;
+    private StringBuilder sb;
+   
+    public void init(){
+      program = new Program();
+      stack   = new Stack();
+      sb = new StringBuilder();
+    }
 }
 
 program: "program" ID { 
@@ -49,8 +51,25 @@ statment: ifStatement | whileStatement | assignmentStatement  | ioStatement | ex
 
 assignmentStatement: ID { 
                           element = LT(0).getText(); 
+                          command = new assignCommand();
                         } 
-                     EQUALS (expression|STRING) {System.out.println();} HT ;
+                     EQUALS (expression|STRING) {                         
+                                                  if( !LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
+                                                    ((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
+                                                    program.setNumberVarValue(element,10.1);// TODO 10.1 must be changed to result of calculation
+                                                    ((assignCommand)command).buildExpression(element, sb.toString());
+                                                    sb.setLength(0);
+                                                  } else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
+                                                    ((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
+                                                    program.setStringVarValue(element,LT(0).getText());
+                                                    ((assignCommand)command).buildString(element,LT(0).getText());
+                                                  } else {
+                                                    throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
+                                                  }
+                                                }
+                     HT {
+                          program.addCommand(command);
+                        };
 
 ifStatement: "se" AP expression RELATIONAL expression FP AC (statment)* FC 
             ("do contrario" AC (statment)* FC)? ;
@@ -63,21 +82,18 @@ ioStatement: "read" AP ID FP HT |
             //expression just do math
             //soh passou aqui, nada de mais, o valor eh pego no inner
 expression: multiplyExpression 
-            (( PLUS {System.out.print(LT(0).getText());} | 
-               MINUS {System.out.print(LT(0).getText());}
+            (( PLUS {sb.append(LT(0).getText()); /*System.out.print(LT(0).getText());*/} | 
+               MINUS {sb.append(LT(0).getText());}
             ) multiplyExpression)* ; 
 
                     //soh passou aqui, nada de mais, o valor eh pego no inner
 multiplyExpression: innerElement 
-                    (( TIMES {System.out.print(LT(0).getText());} | 
-                       DIV {System.out.print(LT(0).getText());}
+                    (( TIMES {sb.append(LT(0).getText());} | 
+                       DIV {sb.append(LT(0).getText());}
                     ) innerElement)* ;
 
-innerElement: NUM  {System.out.print(LT(0).getText());} | 
-              ID {System.out.print(LT(0).getText());}   | 
-              AP {System.out.print(LT(0).getText());} 
-              expression 
-              FP {System.out.print(LT(0).getText());}  ;
+innerElement: NUM  {sb.append(LT(0).getText());} | 
+              ID {sb.append(LT(0).getText());}   ;
 
 
 

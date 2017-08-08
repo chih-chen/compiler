@@ -4,12 +4,12 @@ import java.util.HashMap;
 public class Program{
   
   public static HashMap<String,String> stringVarList;
-  public static HashMap<String,Float>  numberVarList;
+  public static HashMap<String,Double>  numberVarList;
   public static ArrayList<Command> commands;
   public static String className;
   
   public Program(){
-    numberVarList = new HashMap<String,Float>();
+    numberVarList = new HashMap<String,Double>();
     stringVarList = new HashMap<String,String>();
     commands = new ArrayList<Command>();
   }
@@ -32,13 +32,15 @@ public class Program{
     numberVarList.put(var,null);
   }
   
-  public static void setNumberVarValue(String var, Float value){
+  public static void setNumberVarValue(String var, Double value){
     if (numberVarList.containsKey(var)){
         numberVarList.put(var, value);
+    } else {
+      System.out.println("nao tem essa chave!");
     }
   }
   
-  public static Float getNumberVarValue(String var){
+  public static Double getNumberVarValue(String var){
     return numberVarList.get(var);
   }
   

@@ -22,6 +22,7 @@ public class putsCommand extends Command{
     return this.type;
   }
   
+  
   public void run(){
     if (this.getType() == TYPE_ID)
       System.out.println(Program.getStringVarValue(content));       
