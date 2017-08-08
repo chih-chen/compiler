@@ -1,6 +1,10 @@
 // **************************** PARSER RULES *****************************
 class MyParser extends Parser;
 
+options {
+   k = 2;                     // two characters of lookahead
+}
+
 {
    private Program  program;
    private Command  command;
@@ -41,27 +45,42 @@ declaration: ("String" | "Number") ID {
                     }
             ;  
 
-statment: ifStatment | whileStatment | assignmentStatement | ioStatment ;
+statment: ifStatement | whileStatement | assignmentStatement  | ioStatement | expression ;
 
-assignmentStatement: ID EQUALS (expression|NUM|STRING) HT ;
+assignmentStatement: ID { 
+                          element = LT(0).getText(); 
+                        } 
+                     EQUALS (expression|STRING) {System.out.println();} HT ;
 
-ifStatment: "se" AP expression FP AC (statment)* FC 
+ifStatement: "se" AP expression RELATIONAL expression FP AC (statment)* FC 
             ("do contrario" AC (statment)* FC)? ;
 
-whileStatment: "enquanto" AP expression FP AB (statment)* FC ;
+whileStatement: "enquanto" AP (ID|NUM) RELATIONAL (ID|NUM) FP AB (statment)* FC ;
 
-ioStatment: "read" AP ID FP HT |
-            "puts" AP expression FP HT ;
+ioStatement: "read" AP ID FP HT |
+             "puts" AP (expression|STRING) FP HT ;
 
-innerElement: ID | AP expression FP ;
+            //expression just do math
+            //soh passou aqui, nada de mais, o valor eh pego no inner
+expression: multiplyExpression 
+            (( PLUS {System.out.print(LT(0).getText());} | 
+               MINUS {System.out.print(LT(0).getText());}
+            ) multiplyExpression)* ; 
 
-signExpression: ((PLUS|MINUS))* innerElement ;
+                    //soh passou aqui, nada de mais, o valor eh pego no inner
+multiplyExpression: innerElement 
+                    (( TIMES {System.out.print(LT(0).getText());} | 
+                       DIV {System.out.print(LT(0).getText());}
+                    ) innerElement)* ;
 
-multiplyExpression: signExpression ((TIMES|DIV) signExpression)* ;
+innerElement: NUM  {System.out.print(LT(0).getText());} | 
+              ID {System.out.print(LT(0).getText());}   | 
+              AP {System.out.print(LT(0).getText());} 
+              expression 
+              FP {System.out.print(LT(0).getText());}  ;
 
-addExpression: multiplyExpression ((PLUS|MINUS) multiplyExpression)* ;
 
-expression: addExpression ((EQUALS|LT|LTE|GT|GTE) addExpression)* ;
+
 
 // **************************** LEXER RULES *****************************
 
@@ -84,7 +103,7 @@ COMMENT : "//" (~('\n'|'\r'))* {$setType(Token.SKIP);} ;
 
 NUM     : ('0'..'9')+ ('.' ('0'..'9')+ )? ;
         
-STRING  : '"' ('a'..'z' | 'A'..'Z' | ' ' | '?' | '!' | '#' |'(' | ')' | '0'..'9')* '"' ;
+STRING  : '"' ('a'..'z' | 'A'..'Z' | ' ' | '?' | '!' |'(' | ')' | '0'..'9')* '"' ;
 
 //PRINT : "puts" ;  READ : "read" ;                             this causes nondeterminism
 
@@ -95,5 +114,6 @@ ID      options {testLiterals=true;}                            // hash table
 
 AC     : '{' ;   FC    : '}' ;   AP    : '('  ;   FP  : ')' ;
 HT     : '#' ;   COMMA : ',' ;
-EQUALS : '=' ;   LT    : '<' ;   LTE   : "<=" ;   GT  : '>' ;   GTE : ">=" ;  
+EQUALS : '=' ;   
+RELATIONAL: '<' | "<=" | '>' | ">=" | "!=" | "|=";
 PLUS   : '+' ;   MINUS : '-' ;   TIMES : '*'  ;   DIV : '/' ;
