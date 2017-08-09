@@ -2,11 +2,11 @@
 
 ## Checklist:
 - [x] Two variables types.
-- [x] Conditional (if...else) structure.
-- [x] Loop (while) structure. 
+- [ ] Conditional (if...else) structure.
+- [ ] Loop (while) structure. 
 - [x] Can do mathematical operations correctly.
-- [x] Have I/O operations.
+- [ ] Have I/O operations.
 - [x] Accept decimal numbers.
-- [ ] Verify if a variable was previously declared. 
+- [x] Verify if a variable was previously declared. 
 - [ ] Tested.
 
