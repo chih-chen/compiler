@@ -33,12 +33,12 @@ options {
 }
 
 program: "program" ID { 
-                        program.className = LT(0).getText();
-                      } 
+            program.className = LT(0).getText();
+          } 
           EQUALS AC body FC {  
-                              System.out.println(program.writeJava());
-                            }
-        ;
+            System.out.println(program.writeJava());
+          }
+          ;
 
 body: (declaration)* (statment)* ;
 
@@ -49,17 +49,17 @@ declaration: ("String" | "Number") ID {
                 } else {
                   ((decCommand)command).changeMode(decCommand.TYPE_NUMBER);
                 }
-                  ((decCommand)command).addVariable(LT(0).getText());
-                }
-             (COMMA ID {
-                          ((decCommand)command).addVariable(LT(0).getText());
-                        } )* 
-             HT {
-                      program.addCommand(command);
-                    }
-             ;  
+                ((decCommand)command).addVariable(LT(0).getText());
+              }
+              (COMMA ID {
+                ((decCommand)command).addVariable(LT(0).getText());
+              } )* 
+              HT {
+                program.addCommand(command);
+              }
+              ;  
 
-// if pode nest e contem statments, por isso, cada statement precisa ter pilha
+//cada statement precisa ter pilha
 statment: ifStatement | whileStatement | dowhileStatement | assignmentStatement  | ioStatement ;
 
 assignmentStatement: ID { 
@@ -80,15 +80,16 @@ assignmentStatement: ID {
                       } else {
                         throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
                       }
-                     }
+                    }
                      HT {
                       if (stack.isEmpty()){
                         program.addCommand(command);
-                     } else{
+                    } else {
                       Command tmp = stack.getTopElement();
                       tmp.addCommand(command);
-                     }
-                    };
+                    }
+                  }
+                  ;
 
 
 ifStatement: "se" AP (ID | NUM) {
@@ -103,12 +104,13 @@ ifStatement: "se" AP (ID | NUM) {
                 ((ifCommand)command).setLogicalExpr(logicalExpr.toString());
                 stack.push(command);
                 logicalExpr.setLength(0);
-              } FP AC (statment)* FC 
+              } 
+              FP AC (statment)* FC 
               ("senao" AC {
                 ifCommand tmp = (ifCommand)stack.getTopElement();
                 tmp.changeMode(ifCommand.ELSE_MODE);
-              }(statment)* FC)? 
-              {
+              }
+              (statment)* FC)? {
                 Command cmd = stack.pop();
                 if (stack.isEmpty()){
                   program.addCommand(cmd);
@@ -131,9 +133,8 @@ whileStatement: "enquanto" AP (ID | NUM) {
                 ((whileCommand)command).setLogicalExpr(logicalExpr.toString());
                 stack.push(command);
                 logicalExpr.setLength(0);
-              } FP AC (statment)* FC 
-              
-              {
+              } 
+              FP AC (statment)* FC {
                 Command cmd = stack.pop();
                 if (stack.isEmpty()){
                   program.addCommand(cmd);
@@ -144,41 +145,31 @@ whileStatement: "enquanto" AP (ID | NUM) {
               }
               ;
               
-dowhileStatement: "faca"
-
-              {
-                command = new doWhileCommand();
-                
-                stack.push(command);
-                
-              } AC (statment)* FC 
-
-
-              "enquanto" AP (ID | NUM) {
-                logicalExpr.append(LT(0).getText());
-              }
-              RELATIONAL {
-                logicalExpr.append(LT(0).getText());
-              }
-              (ID|NUM) 
-              {
-                logicalExpr.append(LT(0).getText());
-                doWhileCommand temp = (doWhileCommand)stack.getTopElement();
-                temp.setLogicalExpr(logicalExpr.toString());
-                logicalExpr.setLength(0);
-              } FP HT
-              
-              
-              
-              {
-                Command cmd = stack.pop();
-                if (stack.isEmpty()){
-                  program.addCommand(cmd);
-                } else {
-                  Command tmp = stack.getTopElement();
-                  tmp.addCommand(cmd);
+dowhileStatement: "faca" {
+                  command = new doWhileCommand();
+                  stack.push(command);
+                } AC (statment)* FC 
+                "enquanto" AP (ID | NUM) {
+                  logicalExpr.append(LT(0).getText());
                 }
-              }
+                RELATIONAL {
+                  logicalExpr.append(LT(0).getText());
+                }
+                (ID|NUM) {
+                  logicalExpr.append(LT(0).getText());
+                  doWhileCommand temp = (doWhileCommand)stack.getTopElement();
+                  temp.setLogicalExpr(logicalExpr.toString());
+                  logicalExpr.setLength(0);
+                } 
+                FP HT {
+                  Command cmd = stack.pop();
+                  if (stack.isEmpty()){
+                    program.addCommand(cmd);
+                  } else {
+                    Command tmp = stack.getTopElement();
+                    tmp.addCommand(cmd);
+                  }
+                }
               ;
 
 ioStatement: readCommand | putsCommand ;
@@ -194,27 +185,30 @@ readCommand: "read" {
                 } else {
                   throw new RuntimeException ("<<<<< Variavel n declarado! >>>>>");
                 }
-              } FP HT {
-              ((readCommand)command).setId(element);
-              if (stack.isEmpty()){
-                program.addCommand(command);
-              } else {
-                Command tmp = stack.getTopElement();
-                tmp.addCommand(command);
+              } 
+              FP HT {
+                ((readCommand)command).setId(element);
+                if (stack.isEmpty()){
+                  program.addCommand(command);
+                } else {
+                  Command tmp = stack.getTopElement();
+                  tmp.addCommand(command);
+                }
               }
-            }
               ;
               
 putsCommand: "puts" {
                 command = new putsCommand();
-              } AP (ID {
+              } 
+              AP (ID {
                 writeType = putsCommand.TYPE_ID;
               }
               | STRING {
                 writeType = putsCommand.TYPE_TEXT;
               }) {
                 element = LT(0).getText();
-              } FP HT {
+              } 
+              FP HT {
                 ((putsCommand)command).setType(writeType);
                 ((putsCommand)command).setContent(element);
                 if (stack.isEmpty()){
@@ -226,8 +220,8 @@ putsCommand: "puts" {
               } 
               ;
               
-            //expression just do math
-            //soh passou aqui, nada de mais, o valor eh pego no inner
+
+            // valor eh pego no inner
 expression: multiplyExpression {
               result = multiResult;
             }
@@ -257,7 +251,8 @@ multiplyExpression: innerElement {
                     | DIV {
                       operator = LT(0).getText();
                       sb.append(LT(0).getText());
-                    } ) innerElement {
+                    } ) 
+                    innerElement {
                       if(operator.equals("*"))
                         multiResult*=varValue;
                       else
