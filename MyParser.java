@@ -406,13 +406,13 @@ public MyParser(ParserSharedInputState state) {
 			match(FP);
 			match(AC);
 			{
-			_loop31:
+			_loop26:
 			do {
 				if ((_tokenSet_1.member(LA(1)))) {
 					statment();
 				}
 				else {
-					break _loop31;
+					break _loop26;
 				}
 				
 			} while (true);
@@ -480,7 +480,12 @@ public MyParser(ParserSharedInputState state) {
 			
 			match(HT);
 			
+			if (stack.isEmpty()){
 			program.addCommand(command);
+			} else{
+			Command tmp = stack.getTopElement();
+			tmp.addCommand(command);
+			}
 			
 		}
 		catch (RecognitionException ex) {
@@ -525,7 +530,7 @@ public MyParser(ParserSharedInputState state) {
 			result = multiResult;
 			
 			{
-			_loop39:
+			_loop34:
 			do {
 				if ((LA(1)==PLUS||LA(1)==MINUS)) {
 					{
@@ -563,7 +568,7 @@ public MyParser(ParserSharedInputState state) {
 					
 				}
 				else {
-					break _loop39;
+					break _loop34;
 				}
 				
 			} while (true);
@@ -572,71 +577,6 @@ public MyParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_5);
-		}
-	}
-	
-	public final void xwhileStatement() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			match(LITERAL_xenquanto);
-			match(AP);
-			{
-			switch ( LA(1)) {
-			case ID:
-			{
-				match(ID);
-				break;
-			}
-			case NUM:
-			{
-				match(NUM);
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-			}
-			match(RELATIONAL);
-			{
-			switch ( LA(1)) {
-			case ID:
-			{
-				match(ID);
-				break;
-			}
-			case NUM:
-			{
-				match(NUM);
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-			}
-			match(FP);
-			match(AB);
-			{
-			_loop26:
-			do {
-				if ((_tokenSet_1.member(LA(1)))) {
-					statment();
-				}
-				else {
-					break _loop26;
-				}
-				
-			} while (true);
-			}
-			match(FC);
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_0);
 		}
 	}
 	
@@ -742,7 +682,7 @@ public MyParser(ParserSharedInputState state) {
 			multiResult = varValue;
 			
 			{
-			_loop43:
+			_loop38:
 			do {
 				if ((LA(1)==TIMES||LA(1)==DIV)) {
 					{
@@ -780,7 +720,7 @@ public MyParser(ParserSharedInputState state) {
 					
 				}
 				else {
-					break _loop43;
+					break _loop38;
 				}
 				
 			} while (true);
@@ -851,8 +791,6 @@ public MyParser(ParserSharedInputState state) {
 		"RELATIONAL",
 		"FP",
 		"\"senao\"",
-		"\"xenquanto\"",
-		"AB",
 		"\"enquanto\"",
 		"\"read\"",
 		"\"puts\"",
@@ -870,7 +808,7 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 29376544L, 0L};
+		long[] data = { 7356448L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
@@ -880,12 +818,12 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 29378336L, 0L};
+		long[] data = { 7358240L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 29376800L, 0L};
+		long[] data = { 7356704L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
@@ -895,12 +833,12 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 100667392L, 0L};
+		long[] data = { 25169920L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 503320576L, 0L};
+		long[] data = { 125833216L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());

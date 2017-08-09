@@ -82,8 +82,13 @@ assignmentStatement: ID {
                       }
                      }
                      HT {
-                          program.addCommand(command);
-                     };
+                      if (stack.isEmpty()){
+                        program.addCommand(command);
+                     } else{
+                      Command tmp = stack.getTopElement();
+                      tmp.addCommand(command);
+                     }
+                    };
 
 ifStatement: "se" AP (ID | NUM) {
                 logicalExpr.append(LT(0).getText());
@@ -112,9 +117,6 @@ ifStatement: "se" AP (ID | NUM) {
                 }
               }
               ;
-
-
-xwhileStatement: "xenquanto" AP (ID|NUM) RELATIONAL (ID|NUM) FP AB (statment)* FC ;
 
 whileStatement: "enquanto" AP (ID | NUM) {
                 logicalExpr.append(LT(0).getText());

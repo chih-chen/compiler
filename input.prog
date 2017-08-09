@@ -11,16 +11,21 @@ program MyProgram = {
   c = "estou bem!"#
   
   se(x < 2){
-    // a = "nao ola"#   n tem funcao pilha ainda
-    // x = 1/2#         n tem funcao pilha ainda
+    a = "nao ola"#
+    x = 1/2#
     se(y<z){
       puts(a)#
+      enquanto(x>3){
+        read(q)#
+        z = 22#
+        puts(b)#
+      }
     } senao {
       read(q)#
     }
   } senao {
-    //c = "nada bem!"#  n tem funcao pilha ainda
-    //z = 2#            n tem funcao pilha ainda
+    c = "nada bem!"#
+    z = 2#
     puts(b)#
     
     enquanto(x>3){
@@ -37,5 +42,10 @@ program MyProgram = {
   enquanto(x>3){
     read(q)#
     puts(b)#
+    enquanto(x>q){
+      read(q)#
+      q = 123#
+      puts(b)#
+    }
   }
 }
