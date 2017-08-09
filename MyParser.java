@@ -149,7 +149,7 @@ public MyParser(ParserSharedInputState state) {
 			
 			command = new decCommand();
 			if(LT(-1).getText().equals("String")){
-			((decCommand)command).changeMode(decCommand.TYPE_STRING);
+			((decCommand)command).changeMode(decCommand.TYPE_TEXT);
 			} else {
 			((decCommand)command).changeMode(decCommand.TYPE_NUMBER);
 			}
