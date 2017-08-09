@@ -42,7 +42,7 @@ public class ifCommand extends Command {
 
   public void run(){
     for (Command c: ifList){
-      c.run();      //polymorphism
+      c.run();      
     }
     if(!elseList.isEmpty()){
       for(Command c: elseList){
@@ -52,7 +52,7 @@ public class ifCommand extends Command {
   }
   
   public String writeJava(){
-      StringBuilder str = new StringBuilder(); // not thread safe
+      StringBuilder str = new StringBuilder(); 
       str.append("if (");
       str.append(this.getLogicalExpr());
       str.append("){\n");

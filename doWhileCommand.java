@@ -27,17 +27,17 @@ public class doWhileCommand extends Command {
 
   public void run(){
     for (Command c: doWhileList){
-      c.run();      //polymorphism
+      c.run();      
     }
   }
   
   public String writeJava(){
-      StringBuilder str = new StringBuilder(); // not thread safe
+      StringBuilder str = new StringBuilder(); 
       str.append("do {\n");
       for (Command c: doWhileList){
           str.append(c.writeJava());
       }
-      str.append("}\n");
+      str.append("} ");
        str.append("while (");
       str.append(this.getLogicalExpr());
       str.append(");\n");

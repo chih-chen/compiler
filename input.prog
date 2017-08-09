@@ -40,11 +40,15 @@ program MyProgram = {
   }
   
   faca {
-    read(q)#
-    puts(b)#
+    se(q > 2) {
+      read(q)#  
+    }
     
+    puts(b)#
+    q = 10#
     faca {
       read(q)#
+      //d = 20#
       puts(b)#
     }enquanto(x <= 7)#
   }enquanto(x <= 7)#
