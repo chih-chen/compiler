@@ -15,11 +15,11 @@ public interface MyParserTokenTypes {
 	int STRING = 13;
 	int LITERAL_se = 14;
 	int AP = 15;
-	int RELATIONAL = 16;
-	int FP = 17;
-	// "do contrario" = 18
-	int LITERAL_enquanto = 19;
-	int NUM = 20;
+	int NUM = 16;
+	int RELATIONAL = 17;
+	int FP = 18;
+	int LITERAL_senao = 19;
+	int LITERAL_enquanto = 20;
 	int AB = 21;
 	int LITERAL_read = 22;
 	int LITERAL_puts = 23;

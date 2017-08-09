@@ -1,7 +1,11 @@
 import java.util.Scanner;
 
 public class readCommand extends Command{
-    private String id;
+  
+  public static final int TYPE_TEXT   = 1;
+  public static final int TYPE_NUMBER = 2;
+  private String id;
+  private int type;
     
     public void setId(String id){
         this.id = id;
@@ -10,14 +14,22 @@ public class readCommand extends Command{
         return this.id;
     }
     
+    public void setType(int type){
+      this.type = type;
+    }
+    
+    public int getType(){
+      return this.type;
+    }
+    
     public void run(){
-        System.out.println("Rodando comando READ");
-        Scanner teclado = new Scanner(System.in);
-        double valor = teclado.nextInt();
-        Program.setNumberVarValue(id,valor);
+        
     }
     
     public String writeJava(){
-        return id+"=teclado.nextInt();\n";
+      if(this.getType()==readCommand.TYPE_NUMBER)
+        return id+"=scan.nextDouble();\n";
+      else
+        return id+"=scan.nextLine();\n";
     }
 }

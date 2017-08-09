@@ -1,5 +1,5 @@
 program MyProgram = {
-  Number x, y, z#
+  Number x, y, z, q#
   String a, b, c#
   
   x = 10*20/5#
@@ -10,5 +10,17 @@ program MyProgram = {
   b = "Tudo bem?"#
   c = "estou bem!"#
   
-  
+  se(x < 2){
+    // a = "nao ola"#   n tem funcao pilha ainda
+    // x = 1/2#         n tem funcao pilha ainda
+    se(y<z){
+      puts(a)#
+    } senao {
+      read(q)#
+    }
+  } senao {
+    //c = "nada bem!"#  n tem funcao pilha ainda
+    //z = 2#            n tem funcao pilha ainda
+    puts(b)#
+  }
 }

@@ -13,15 +13,22 @@ options {
     private double  multiResult;
     private double  varValue;
     private String  operator;
+    //relational operation string
+    private StringBuilder logicalExpr;
+    //assignment / puts
+    private String element;
+    //puts 
+    private int writeType;
     // --
-    private String  element;
     private Stack   stack;
+    //math expression string builder
     private StringBuilder sb;
    
     public void init(){
       program = new Program();
       stack   = new Stack();
       sb = new StringBuilder();
+      logicalExpr = new StringBuilder();
     }
 }
 
@@ -36,23 +43,24 @@ program: "program" ID {
 body: (declaration)* (statment)* ;
 
 declaration: ("String" | "Number") ID { 
-                                        command = new decCommand();
-                                        if(LT(-1).getText().equals("String")){
-                                          ((decCommand)command).changeMode(decCommand.TYPE_STRING);
-                                        } else {
-                                          ((decCommand)command).changeMode(decCommand.TYPE_NUMBER);
-                                        }
-                                        ((decCommand)command).addVariable(LT(0).getText());
-                                      }
-              (COMMA ID {
+                command = new decCommand();
+                if(LT(-1).getText().equals("String")){
+                  ((decCommand)command).changeMode(decCommand.TYPE_STRING);
+                } else {
+                  ((decCommand)command).changeMode(decCommand.TYPE_NUMBER);
+                }
+                  ((decCommand)command).addVariable(LT(0).getText());
+                }
+             (COMMA ID {
                           ((decCommand)command).addVariable(LT(0).getText());
-                        }
-              )* HT {
+                        } )* 
+             HT {
                       program.addCommand(command);
                     }
-            ;  
+             ;  
 
-statment: ifStatement | whileStatement | assignmentStatement  | ioStatement | expression ;
+// if pode nest e contem statments, por isso, cada statement precisa ter pilha
+statment: ifStatement | whileStatement | assignmentStatement  | ioStatement ;
 
 assignmentStatement: ID { 
                       element = LT(0).getText(); 
@@ -62,7 +70,7 @@ assignmentStatement: ID {
                       if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
                         ((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
                         program.setNumberVarValue(element,result);
-                        System.out.println("Resultado = " + result);
+                        //System.out.println("Resultado = " + result);
                         ((assignCommand)command).buildExpression(element, sb.toString());
                         sb.setLength(0);
                       } else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
@@ -77,14 +85,82 @@ assignmentStatement: ID {
                           program.addCommand(command);
                      };
 
-ifStatement: "se" AP expression RELATIONAL expression FP AC (statment)* FC 
-            ("do contrario" AC (statment)* FC)? ;
+ifStatement: "se" AP (ID | NUM) {
+                logicalExpr.append(LT(0).getText());
+              }
+              RELATIONAL {
+                logicalExpr.append(LT(0).getText());
+              }
+              (ID|NUM) {
+                command = new ifCommand();
+                logicalExpr.append(LT(0).getText());
+                ((ifCommand)command).setLogicalExpr(logicalExpr.toString());
+                stack.push(command);
+                logicalExpr.setLength(0);
+              } FP AC (statment)* FC 
+              ("senao" AC {
+                ifCommand tmp = (ifCommand)stack.getTopElement();
+                tmp.changeMode(ifCommand.ELSE_MODE);
+              }(statment)* FC)? 
+              {
+                Command cmd = stack.pop();
+                if (stack.isEmpty()){
+                  program.addCommand(cmd);
+                } else {
+                  ifCommand tmp = (ifCommand)stack.getTopElement();
+                  tmp.addCommand(cmd);
+                }
+              }
+              ;
+
 
 whileStatement: "enquanto" AP (ID|NUM) RELATIONAL (ID|NUM) FP AB (statment)* FC ;
 
-ioStatement: "read" AP ID FP HT |
-             "puts" AP (expression|STRING) FP HT ;
-
+ioStatement: readCommand | putsCommand ;
+             
+readCommand: "read" { 
+                command = new readCommand(); 
+              } AP ID {
+                element = LT(0).getText();
+                if(program.stringVarList.containsKey(element)){
+                  ((readCommand)command).setType(readCommand.TYPE_TEXT);
+                } else if(program.numberVarList.containsKey(element)) {
+                  ((readCommand)command).setType(readCommand.TYPE_NUMBER);
+                } else {
+                  throw new RuntimeException ("<<<<< Variavel n declarado! >>>>>");
+                }
+              } FP HT {
+              ((readCommand)command).setId(element);
+              if (stack.isEmpty()){
+                program.addCommand(command);
+              } else {
+                Command tmp = stack.getTopElement();
+                ((ifCommand)tmp).addCommand(command);
+              }
+            }
+              ;
+              
+putsCommand: "puts" {
+                command = new putsCommand();
+              } AP (ID {
+                writeType = putsCommand.TYPE_ID;
+              }
+              | STRING {
+                writeType = putsCommand.TYPE_TEXT;
+              }) {
+                element = LT(0).getText();
+              } FP HT {
+                ((putsCommand)command).setType(writeType);
+                ((putsCommand)command).setContent(element);
+                if (stack.isEmpty()){
+                   program.addCommand(command);
+                } else{
+                  Command tmp = stack.getTopElement();
+                  ((ifCommand)tmp).addCommand(command);
+                }
+              } 
+              ;
+              
             //expression just do math
             //soh passou aqui, nada de mais, o valor eh pego no inner
 expression: multiplyExpression {
@@ -143,8 +219,7 @@ class MyLexer extends Lexer;
 options {
    k              = 2;                     // two characters of lookahead
    testLiterals   = false;  
-   caseSensitive  = true;   
-   //charVocabulary = '\0'..'\377';
+   caseSensitive  = true;
 }
 
 WS      : (' ' | '\n' | '\r' | '\t') 

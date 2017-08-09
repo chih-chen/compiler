@@ -25,7 +25,7 @@ public class ifCommand extends Command {
     return this.logicalExpr;
   }
   
-  public void setMode(int mode){
+  public void changeMode(int mode){
     this.mode = mode;
   }
   

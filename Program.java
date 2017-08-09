@@ -58,7 +58,7 @@ public class Program{
       StringBuilder str = new StringBuilder();
       str.append("public class "+this.className+"{\n");
       str.append("public static void main(String args[]){\n");
-      str.append("java.util.Scanner teclado = new java.util.Scanner(System.in);\n");
+      str.append("java.util.Scanner scan = new java.util.Scanner(System.in);\n");
 
       for (Command c: commands){
           str.append(c.writeJava());    
