@@ -197,6 +197,11 @@ public MyParser(ParserSharedInputState state) {
 				whileStatement();
 				break;
 			}
+			case LITERAL_faca:
+			{
+				dowhileStatement();
+				break;
+			}
 			case ID:
 			{
 				assignmentStatement();
@@ -320,6 +325,7 @@ public MyParser(ParserSharedInputState state) {
 			case FC:
 			case LITERAL_se:
 			case LITERAL_enquanto:
+			case LITERAL_faca:
 			case LITERAL_read:
 			case LITERAL_puts:
 			{
@@ -434,6 +440,100 @@ public MyParser(ParserSharedInputState state) {
 		}
 	}
 	
+	public final void dowhileStatement() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			match(LITERAL_faca);
+			
+			command = new doWhileCommand();
+			
+			stack.push(command);
+			
+			
+			match(AC);
+			{
+			_loop29:
+			do {
+				if ((_tokenSet_1.member(LA(1)))) {
+					statment();
+				}
+				else {
+					break _loop29;
+				}
+				
+			} while (true);
+			}
+			match(FC);
+			match(LITERAL_enquanto);
+			match(AP);
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			
+			logicalExpr.append(LT(0).getText());
+			
+			match(RELATIONAL);
+			
+			logicalExpr.append(LT(0).getText());
+			
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			
+			logicalExpr.append(LT(0).getText());
+			doWhileCommand temp = (doWhileCommand)stack.getTopElement();
+			temp.setLogicalExpr(logicalExpr.toString());
+			logicalExpr.setLength(0);
+			
+			match(FP);
+			match(HT);
+			
+			Command cmd = stack.pop();
+			if (stack.isEmpty()){
+			program.addCommand(cmd);
+			} else {
+			Command tmp = stack.getTopElement();
+			tmp.addCommand(cmd);
+			}
+			
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_4);
+		}
+	}
+	
 	public final void assignmentStatement() throws RecognitionException, TokenStreamException {
 		
 		
@@ -530,7 +630,7 @@ public MyParser(ParserSharedInputState state) {
 			result = multiResult;
 			
 			{
-			_loop34:
+			_loop39:
 			do {
 				if ((LA(1)==PLUS||LA(1)==MINUS)) {
 					{
@@ -568,7 +668,7 @@ public MyParser(ParserSharedInputState state) {
 					
 				}
 				else {
-					break _loop34;
+					break _loop39;
 				}
 				
 			} while (true);
@@ -682,7 +782,7 @@ public MyParser(ParserSharedInputState state) {
 			multiResult = varValue;
 			
 			{
-			_loop38:
+			_loop43:
 			do {
 				if ((LA(1)==TIMES||LA(1)==DIV)) {
 					{
@@ -720,7 +820,7 @@ public MyParser(ParserSharedInputState state) {
 					
 				}
 				else {
-					break _loop38;
+					break _loop43;
 				}
 				
 			} while (true);
@@ -792,6 +892,7 @@ public MyParser(ParserSharedInputState state) {
 		"FP",
 		"\"senao\"",
 		"\"enquanto\"",
+		"\"faca\"",
 		"\"read\"",
 		"\"puts\"",
 		"PLUS",
@@ -808,7 +909,7 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 7356448L, 0L};
+		long[] data = { 15745056L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
@@ -818,12 +919,12 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 7358240L, 0L};
+		long[] data = { 15746848L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 7356704L, 0L};
+		long[] data = { 15745312L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
@@ -833,12 +934,12 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 25169920L, 0L};
+		long[] data = { 50335744L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 125833216L, 0L};
+		long[] data = { 251662336L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());

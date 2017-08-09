@@ -20,12 +20,13 @@ public interface MyParserTokenTypes {
 	int FP = 18;
 	int LITERAL_senao = 19;
 	int LITERAL_enquanto = 20;
-	int LITERAL_read = 21;
-	int LITERAL_puts = 22;
-	int PLUS = 23;
-	int MINUS = 24;
-	int TIMES = 25;
-	int DIV = 26;
-	int WS = 27;
-	int COMMENT = 28;
+	int LITERAL_faca = 21;
+	int LITERAL_read = 22;
+	int LITERAL_puts = 23;
+	int PLUS = 24;
+	int MINUS = 25;
+	int TIMES = 26;
+	int DIV = 27;
+	int WS = 28;
+	int COMMENT = 29;
 }
