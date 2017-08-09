@@ -6,11 +6,16 @@ options {
 }
 
 {
-    private Program  program;
-    private Command  command;
-    private int      result;
-    private String   element;
-    private Stack    stack;
+    private Program program;
+    private Command command;
+    //math variables
+    private double  result;
+    private double  multiResult;
+    private double  varValue;
+    private String  operator;
+    // --
+    private String  element;
+    private Stack   stack;
     private StringBuilder sb;
    
     public void init(){
@@ -50,26 +55,27 @@ declaration: ("String" | "Number") ID {
 statment: ifStatement | whileStatement | assignmentStatement  | ioStatement | expression ;
 
 assignmentStatement: ID { 
-                          element = LT(0).getText(); 
-                          command = new assignCommand();
-                        } 
+                      element = LT(0).getText(); 
+                      command = new assignCommand();
+                     } 
                      EQUALS (expression|STRING) {                         
-                                                  if( !LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
-                                                    ((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
-                                                    program.setNumberVarValue(element,10.1);// TODO 10.1 must be changed to result of calculation
-                                                    ((assignCommand)command).buildExpression(element, sb.toString());
-                                                    sb.setLength(0);
-                                                  } else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
-                                                    ((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
-                                                    program.setStringVarValue(element,LT(0).getText());
-                                                    ((assignCommand)command).buildString(element,LT(0).getText());
-                                                  } else {
-                                                    throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
-                                                  }
-                                                }
+                      if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
+                        ((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
+                        program.setNumberVarValue(element,result);
+                        System.out.println("Resultado = " + result);
+                        ((assignCommand)command).buildExpression(element, sb.toString());
+                        sb.setLength(0);
+                      } else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
+                        ((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
+                        program.setStringVarValue(element,LT(0).getText());
+                        ((assignCommand)command).buildString(element,LT(0).getText());
+                      } else {
+                        throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
+                      }
+                     }
                      HT {
                           program.addCommand(command);
-                        };
+                     };
 
 ifStatement: "se" AP expression RELATIONAL expression FP AC (statment)* FC 
             ("do contrario" AC (statment)* FC)? ;
@@ -81,22 +87,54 @@ ioStatement: "read" AP ID FP HT |
 
             //expression just do math
             //soh passou aqui, nada de mais, o valor eh pego no inner
-expression: multiplyExpression 
-            (( PLUS {sb.append(LT(0).getText()); /*System.out.print(LT(0).getText());*/} | 
-               MINUS {sb.append(LT(0).getText());}
-            ) multiplyExpression)* ; 
+expression: multiplyExpression {
+              result = multiResult;
+            }
+            (( PLUS {
+              operator = LT(0).getText();
+              sb.append(LT(0).getText());
+            } 
+            | MINUS {
+              operator = LT(0).getText();
+              sb.append(LT(0).getText());
+            } ) multiplyExpression {
+              if(operator.equals("+"))
+                result+=multiResult;
+              else
+                result-=multiResult;
+            })* 
+            ; 
 
                     //soh passou aqui, nada de mais, o valor eh pego no inner
-multiplyExpression: innerElement 
-                    (( TIMES {sb.append(LT(0).getText());} | 
-                       DIV {sb.append(LT(0).getText());}
-                    ) innerElement)* ;
+multiplyExpression: innerElement {
+                      multiResult = varValue;
+                    }
+                    (( TIMES {
+                      operator = LT(0).getText();
+                      sb.append(LT(0).getText());
+                    } 
+                    | DIV {
+                      operator = LT(0).getText();
+                      sb.append(LT(0).getText());
+                    } ) innerElement {
+                      if(operator.equals("*"))
+                        multiResult*=varValue;
+                      else
+                        multiResult/=varValue;
+                    })* 
+                    ;
 
-innerElement: NUM  {sb.append(LT(0).getText());} | 
-              ID {sb.append(LT(0).getText());}   ;
-
-
-
+innerElement: NUM {
+                sb.append(LT(0).getText());
+                varValue = Double.parseDouble(LT(0).getText());
+              } 
+              | ID {
+                sb.append(LT(0).getText());
+                if(program.numberVarList.get(LT(0).getText())==null)
+                  throw new RuntimeException("<<<<< Usou sem atribuir! >>>>>");
+                varValue = program.numberVarList.get(LT(0).getText());
+              }   
+              ;
 
 // **************************** LEXER RULES *****************************
 
