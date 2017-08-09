@@ -44,10 +44,11 @@ public MyLexer(LexerSharedInputState state) {
 	literals.put(new ANTLRHashString("Number", this), new Integer(10));
 	literals.put(new ANTLRHashString("se", this), new Integer(14));
 	literals.put(new ANTLRHashString("senao", this), new Integer(19));
-	literals.put(new ANTLRHashString("puts", this), new Integer(22));
+	literals.put(new ANTLRHashString("puts", this), new Integer(23));
 	literals.put(new ANTLRHashString("enquanto", this), new Integer(20));
 	literals.put(new ANTLRHashString("program", this), new Integer(4));
-	literals.put(new ANTLRHashString("read", this), new Integer(21));
+	literals.put(new ANTLRHashString("read", this), new Integer(22));
+	literals.put(new ANTLRHashString("faca", this), new Integer(21));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -247,7 +248,7 @@ tryAgain:
 		
 		match("//");
 		{
-		_loop45:
+		_loop50:
 		do {
 			if ((_tokenSet_0.member(LA(1)))) {
 				{
@@ -255,7 +256,7 @@ tryAgain:
 				}
 			}
 			else {
-				break _loop45;
+				break _loop50;
 			}
 			
 		} while (true);
@@ -274,34 +275,34 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt48=0;
-		_loop48:
+		int _cnt53=0;
+		_loop53:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt48>=1 ) { break _loop48; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt53>=1 ) { break _loop53; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt48++;
+			_cnt53++;
 		} while (true);
 		}
 		{
 		if ((LA(1)=='.')) {
 			match('.');
 			{
-			int _cnt51=0;
-			_loop51:
+			int _cnt56=0;
+			_loop56:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt51>=1 ) { break _loop51; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt56>=1 ) { break _loop56; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt51++;
+				_cnt56++;
 			} while (true);
 			}
 		}
@@ -323,7 +324,7 @@ tryAgain:
 		
 		match('"');
 		{
-		_loop54:
+		_loop59:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -382,7 +383,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop54;
+				break _loop59;
 			}
 			}
 		} while (true);
@@ -431,7 +432,7 @@ tryAgain:
 		}
 		}
 		{
-		_loop58:
+		_loop63:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -470,7 +471,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop58;
+				break _loop63;
 			}
 			}
 		} while (true);

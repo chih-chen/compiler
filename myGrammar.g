@@ -60,7 +60,7 @@ declaration: ("String" | "Number") ID {
              ;  
 
 // if pode nest e contem statments, por isso, cada statement precisa ter pilha
-statment: ifStatement | whileStatement | assignmentStatement  | ioStatement ;
+statment: ifStatement | whileStatement | dowhileStatement | assignmentStatement  | ioStatement ;
 
 assignmentStatement: ID { 
                       element = LT(0).getText(); 
@@ -132,6 +132,43 @@ whileStatement: "enquanto" AP (ID | NUM) {
                 stack.push(command);
                 logicalExpr.setLength(0);
               } FP AC (statment)* FC 
+              
+              {
+                Command cmd = stack.pop();
+                if (stack.isEmpty()){
+                  program.addCommand(cmd);
+                } else {
+                  Command tmp = stack.getTopElement();
+                  tmp.addCommand(cmd);
+                }
+              }
+              ;
+              
+dowhileStatement: "faca"
+
+              {
+                command = new doWhileCommand();
+                
+                stack.push(command);
+                
+              } AC (statment)* FC 
+
+
+              "enquanto" AP (ID | NUM) {
+                logicalExpr.append(LT(0).getText());
+              }
+              RELATIONAL {
+                logicalExpr.append(LT(0).getText());
+              }
+              (ID|NUM) 
+              {
+                logicalExpr.append(LT(0).getText());
+                doWhileCommand temp = (doWhileCommand)stack.getTopElement();
+                temp.setLogicalExpr(logicalExpr.toString());
+                logicalExpr.setLength(0);
+              } FP HT
+              
+              
               
               {
                 Command cmd = stack.pop();

@@ -39,6 +39,16 @@ program MyProgram = {
     }
   }
   
+  faca {
+    read(q)#
+    puts(b)#
+    
+    faca {
+      read(q)#
+      puts(b)#
+    }enquanto(x <= 7)#
+  }enquanto(x <= 7)#
+  
   enquanto(x>3){
     read(q)#
     puts(b)#
