@@ -266,7 +266,7 @@ innerElement: NUM {
               } 
               | ID {
                 sb.append(LT(0).getText());
-                if(program.numberVarList.get(LT(0).getText())==null)
+                if(!program.numberVarList.containsKey(LT(0).getText()) || program.getNumberVarValue(LT(0).getText())==null)
                   throw new RuntimeException("<<<<< Usou sem atribuir! >>>>>");
                 varValue = program.numberVarList.get(LT(0).getText());
               }   

@@ -1,65 +1,95 @@
-program MyProgram = {
-  Number x, y, z, q#
-  String a, b, c#
+// program MyProgram = {
+//   Number x, y, z, q#
+//   String a, b, c#
   
-  x = 10*20/5#
-  y = 10+30#
-  z = 3.2-8.1*55#
+//   x = 10*20/5#
+//   y = 10+30#
+//   z = 3.2-8.1*55#
   
-  a = "Ola"#
-  b = "Tudo bem?"#
-  c = "estou bem!"#
+//   a = "Ola"#
+//   b = "Tudo bem?"#
+//   c = "estou bem!"#
   
-  se(x < 2){
-    a = "nao ola"#
-    x = 1/2#
-    se(y<z){
-      puts(a)#
-      enquanto(x>3){
-        read(q)#
-        z = 22#
-        puts(b)#
-      }
-    } senao {
-      read(q)#
-    }
+//   se(x < 2){
+//     a = "nao ola"#
+//     x = 1/2#
+//     se(y<z){
+//       puts(a)#
+//       enquanto(x>3){
+//         read(q)#
+//         z = 22#
+//         puts(b)#
+//       }
+//     } senao {
+//       read(q)#
+//     }
+//   } senao {
+//     c = "nada bem!"#
+//     z = 2#
+//     puts(b)#
+    
+//     enquanto(x>3){
+//       read(q)#
+      
+//       se(x >= y){
+//         read(q)#
+//       }
+      
+//       puts(b)#
+//     }
+//   }
+  
+//   faca {
+//     se(q > 2) {
+//       read(q)#  
+//     }
+    
+//     puts(b)#
+//     q = 10#
+//     faca {
+//       read(q)#
+//       //d = 20#
+//       puts(b)#
+//     }enquanto(x <= 7)#
+//   }enquanto(x <= 7)#
+  
+//   enquanto(x>3){
+//     read(q)#
+//     puts(b)#
+//     enquanto(x>q){
+//       read(q)#
+//       q = 123#
+//       puts(b)#
+//     }
+//   }
+// }
+
+program Teste = {
+  Number a,b,c,d#
+  a = 0 #
+  b = 0 #
+  c = 0 #
+  d = 0 #
+  
+  puts("Programa Teste")#
+  puts("Digite A")#
+  read(a)#
+  
+  puts("Digite B")#
+  read(b)#
+  
+  se(a<b){
+    c = a + b#
   } senao {
-    c = "nada bem!"#
-    z = 2#
-    puts(b)#
-    
-    enquanto(x>3){
-      read(q)#
-      
-      se(x >= y){
-        read(q)#
-      }
-      
-      puts(b)#
-    }
+    c = a - b#
   }
   
-  faca {
-    se(q > 2) {
-      read(q)#  
-    }
-    
-    puts(b)#
-    q = 10#
-    faca {
-      read(q)#
-      //d = 20#
-      puts(b)#
-    }enquanto(x <= 7)#
-  }enquanto(x <= 7)#
+  puts("C e igual a ")#
+  puts(c)#
   
-  enquanto(x>3){
-    read(q)#
-    puts(b)#
-    enquanto(x>q){
-      read(q)#
-      q = 123#
-      puts(b)#
-    }
-  }
+  d = c * a + b#
+  
+  puts("D e igual a")#
+  puts(d)#
+  
 }
