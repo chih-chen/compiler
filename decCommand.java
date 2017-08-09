@@ -28,7 +28,7 @@ public class decCommand extends Command {
   public String writeJava(){
     
     StringBuilder str = new StringBuilder();
-    if(this.mode == TYPE_STRING){
+    if(this.mode == TYPE_TEXT){
       for(String var: Program.stringVarList.keySet()){
         str.append("String "+var+";\n");
       }

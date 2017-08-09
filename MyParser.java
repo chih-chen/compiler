@@ -149,7 +149,7 @@ public MyParser(ParserSharedInputState state) {
 			
 			command = new decCommand();
 			if(LT(-1).getText().equals("String")){
-			((decCommand)command).changeMode(decCommand.TYPE_STRING);
+			((decCommand)command).changeMode(decCommand.TYPE_TEXT);
 			} else {
 			((decCommand)command).changeMode(decCommand.TYPE_NUMBER);
 			}
@@ -336,7 +336,7 @@ public MyParser(ParserSharedInputState state) {
 			if (stack.isEmpty()){
 			program.addCommand(cmd);
 			} else {
-			ifCommand tmp = (ifCommand)stack.getTopElement();
+			Command tmp = stack.getTopElement();
 			tmp.addCommand(cmd);
 			}
 			
@@ -352,6 +352,239 @@ public MyParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(LITERAL_enquanto);
+			match(AP);
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			
+			logicalExpr.append(LT(0).getText());
+			
+			match(RELATIONAL);
+			
+			logicalExpr.append(LT(0).getText());
+			
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			
+			command = new whileCommand();
+			logicalExpr.append(LT(0).getText());
+			((whileCommand)command).setLogicalExpr(logicalExpr.toString());
+			stack.push(command);
+			logicalExpr.setLength(0);
+			
+			match(FP);
+			match(AC);
+			{
+			_loop31:
+			do {
+				if ((_tokenSet_1.member(LA(1)))) {
+					statment();
+				}
+				else {
+					break _loop31;
+				}
+				
+			} while (true);
+			}
+			match(FC);
+			
+			Command cmd = stack.pop();
+			if (stack.isEmpty()){
+			program.addCommand(cmd);
+			} else {
+			Command tmp = stack.getTopElement();
+			tmp.addCommand(cmd);
+			}
+			
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_4);
+		}
+	}
+	
+	public final void assignmentStatement() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			match(ID);
+			
+			element = LT(0).getText(); 
+			command = new assignCommand();
+			
+			match(EQUALS);
+			{
+			switch ( LA(1)) {
+			case ID:
+			case NUM:
+			{
+				expression();
+				break;
+			}
+			case STRING:
+			{
+				match(STRING);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			
+			if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
+			((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
+			program.setNumberVarValue(element,result);
+			//System.out.println("Resultado = " + result);
+			((assignCommand)command).buildExpression(element, sb.toString());
+			sb.setLength(0);
+			} else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
+			((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
+			program.setStringVarValue(element,LT(0).getText());
+			((assignCommand)command).buildString(element,LT(0).getText());
+			} else {
+			throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
+			}
+			
+			match(HT);
+			
+			if (stack.isEmpty()){
+			program.addCommand(command);
+			} else{
+			Command tmp = stack.getTopElement();
+			tmp.addCommand(command);
+			}
+			
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_4);
+		}
+	}
+	
+	public final void ioStatement() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			switch ( LA(1)) {
+			case LITERAL_read:
+			{
+				readCommand();
+				break;
+			}
+			case LITERAL_puts:
+			{
+				putsCommand();
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_4);
+		}
+	}
+	
+	public final void expression() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			multiplyExpression();
+			
+			result = multiResult;
+			
+			{
+			_loop39:
+			do {
+				if ((LA(1)==PLUS||LA(1)==MINUS)) {
+					{
+					switch ( LA(1)) {
+					case PLUS:
+					{
+						match(PLUS);
+						
+						operator = LT(0).getText();
+						sb.append(LT(0).getText());
+						
+						break;
+					}
+					case MINUS:
+					{
+						match(MINUS);
+						
+						operator = LT(0).getText();
+						sb.append(LT(0).getText());
+						
+						break;
+					}
+					default:
+					{
+						throw new NoViableAltException(LT(1), getFilename());
+					}
+					}
+					}
+					multiplyExpression();
+					
+					if(operator.equals("+"))
+					result+=multiResult;
+					else
+					result-=multiResult;
+					
+				}
+				else {
+					break _loop39;
+				}
+				
+			} while (true);
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_5);
+		}
+	}
+	
+	public final void xwhileStatement() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			match(LITERAL_xenquanto);
 			match(AP);
 			{
 			switch ( LA(1)) {
@@ -408,148 +641,7 @@ public MyParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_4);
-		}
-	}
-	
-	public final void assignmentStatement() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			match(ID);
-			
-			element = LT(0).getText(); 
-			command = new assignCommand();
-			
-			match(EQUALS);
-			{
-			switch ( LA(1)) {
-			case ID:
-			case NUM:
-			{
-				expression();
-				break;
-			}
-			case STRING:
-			{
-				match(STRING);
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-			}
-			
-			if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
-			((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
-			program.setNumberVarValue(element,result);
-			//System.out.println("Resultado = " + result);
-			((assignCommand)command).buildExpression(element, sb.toString());
-			sb.setLength(0);
-			} else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
-			((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
-			program.setStringVarValue(element,LT(0).getText());
-			((assignCommand)command).buildString(element,LT(0).getText());
-			} else {
-			throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
-			}
-			
-			match(HT);
-			
-			program.addCommand(command);
-			
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_4);
-		}
-	}
-	
-	public final void ioStatement() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			switch ( LA(1)) {
-			case LITERAL_read:
-			{
-				readCommand();
-				break;
-			}
-			case LITERAL_puts:
-			{
-				putsCommand();
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_4);
-		}
-	}
-	
-	public final void expression() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			multiplyExpression();
-			
-			result = multiResult;
-			
-			{
-			_loop34:
-			do {
-				if ((LA(1)==PLUS||LA(1)==MINUS)) {
-					{
-					switch ( LA(1)) {
-					case PLUS:
-					{
-						match(PLUS);
-						
-						operator = LT(0).getText();
-						sb.append(LT(0).getText());
-						
-						break;
-					}
-					case MINUS:
-					{
-						match(MINUS);
-						
-						operator = LT(0).getText();
-						sb.append(LT(0).getText());
-						
-						break;
-					}
-					default:
-					{
-						throw new NoViableAltException(LT(1), getFilename());
-					}
-					}
-					}
-					multiplyExpression();
-					
-					if(operator.equals("+"))
-					result+=multiResult;
-					else
-					result-=multiResult;
-					
-				}
-				else {
-					break _loop34;
-				}
-				
-			} while (true);
-			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_5);
+			recover(ex,_tokenSet_0);
 		}
 	}
 	
@@ -581,7 +673,7 @@ public MyParser(ParserSharedInputState state) {
 			program.addCommand(command);
 			} else {
 			Command tmp = stack.getTopElement();
-			((ifCommand)tmp).addCommand(command);
+			tmp.addCommand(command);
 			}
 			
 		}
@@ -636,7 +728,7 @@ public MyParser(ParserSharedInputState state) {
 			program.addCommand(command);
 			} else{
 			Command tmp = stack.getTopElement();
-			((ifCommand)tmp).addCommand(command);
+			tmp.addCommand(command);
 			}
 			
 		}
@@ -655,7 +747,7 @@ public MyParser(ParserSharedInputState state) {
 			multiResult = varValue;
 			
 			{
-			_loop38:
+			_loop43:
 			do {
 				if ((LA(1)==TIMES||LA(1)==DIV)) {
 					{
@@ -693,7 +785,7 @@ public MyParser(ParserSharedInputState state) {
 					
 				}
 				else {
-					break _loop38;
+					break _loop43;
 				}
 				
 			} while (true);
@@ -764,8 +856,9 @@ public MyParser(ParserSharedInputState state) {
 		"RELATIONAL",
 		"FP",
 		"\"senao\"",
-		"\"enquanto\"",
+		"\"xenquanto\"",
 		"AB",
+		"\"enquanto\"",
 		"\"read\"",
 		"\"puts\"",
 		"PLUS",
@@ -782,7 +875,7 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 13647904L, 0L};
+		long[] data = { 29376544L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
@@ -792,12 +885,12 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 13649696L, 0L};
+		long[] data = { 29378336L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 13648160L, 0L};
+		long[] data = { 29376800L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
@@ -807,12 +900,12 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 50335744L, 0L};
+		long[] data = { 100667392L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 251662336L, 0L};
+		long[] data = { 503320576L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());

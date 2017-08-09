@@ -19,14 +19,15 @@ public interface MyParserTokenTypes {
 	int RELATIONAL = 17;
 	int FP = 18;
 	int LITERAL_senao = 19;
-	int LITERAL_enquanto = 20;
+	int LITERAL_xenquanto = 20;
 	int AB = 21;
-	int LITERAL_read = 22;
-	int LITERAL_puts = 23;
-	int PLUS = 24;
-	int MINUS = 25;
-	int TIMES = 26;
-	int DIV = 27;
-	int WS = 28;
-	int COMMENT = 29;
+	int LITERAL_enquanto = 22;
+	int LITERAL_read = 23;
+	int LITERAL_puts = 24;
+	int PLUS = 25;
+	int MINUS = 26;
+	int TIMES = 27;
+	int DIV = 28;
+	int WS = 29;
+	int COMMENT = 30;
 }
