@@ -13,7 +13,7 @@ public class readCommand extends Command{
     public void run(){
         System.out.println("Rodando comando READ");
         Scanner teclado = new Scanner(System.in);
-        float valor = teclado.nextInt();
+        double valor = teclado.nextInt();
         Program.setNumberVarValue(id,valor);
     }
     

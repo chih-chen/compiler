@@ -42,12 +42,12 @@ public MyLexer(LexerSharedInputState state) {
 	literals = new Hashtable();
 	literals.put(new ANTLRHashString("String", this), new Integer(9));
 	literals.put(new ANTLRHashString("Number", this), new Integer(10));
-	literals.put(new ANTLRHashString("se", this), new Integer(15));
-	literals.put(new ANTLRHashString("puts", this), new Integer(22));
+	literals.put(new ANTLRHashString("se", this), new Integer(14));
+	literals.put(new ANTLRHashString("puts", this), new Integer(23));
 	literals.put(new ANTLRHashString("enquanto", this), new Integer(19));
 	literals.put(new ANTLRHashString("do contrario", this), new Integer(18));
 	literals.put(new ANTLRHashString("program", this), new Integer(4));
-	literals.put(new ANTLRHashString("read", this), new Integer(21));
+	literals.put(new ANTLRHashString("read", this), new Integer(22));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -140,6 +140,12 @@ tryAgain:
 					theRetToken=_returnToken;
 					break;
 				}
+				case '!':  case '<':  case '>':  case '|':
+				{
+					mRELATIONAL(true);
+					theRetToken=_returnToken;
+					break;
+				}
 				case '+':
 				{
 					mPLUS(true);
@@ -161,22 +167,6 @@ tryAgain:
 				default:
 					if ((LA(1)=='/') && (LA(2)=='/')) {
 						mCOMMENT(true);
-						theRetToken=_returnToken;
-					}
-					else if ((LA(1)=='<') && (LA(2)=='=')) {
-						mLTE(true);
-						theRetToken=_returnToken;
-					}
-					else if ((LA(1)=='>') && (LA(2)=='=')) {
-						mGTE(true);
-						theRetToken=_returnToken;
-					}
-					else if ((LA(1)=='<') && (true)) {
-						mLT(true);
-						theRetToken=_returnToken;
-					}
-					else if ((LA(1)=='>') && (true)) {
-						mGT(true);
 						theRetToken=_returnToken;
 					}
 					else if ((LA(1)=='/') && (true)) {
@@ -257,7 +247,7 @@ tryAgain:
 		
 		match("//");
 		{
-		_loop46:
+		_loop41:
 		do {
 			if ((_tokenSet_0.member(LA(1)))) {
 				{
@@ -265,7 +255,7 @@ tryAgain:
 				}
 			}
 			else {
-				break _loop46;
+				break _loop41;
 			}
 			
 		} while (true);
@@ -284,34 +274,34 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt49=0;
-		_loop49:
+		int _cnt44=0;
+		_loop44:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt49>=1 ) { break _loop49; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt44>=1 ) { break _loop44; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt49++;
+			_cnt44++;
 		} while (true);
 		}
 		{
 		if ((LA(1)=='.')) {
 			match('.');
 			{
-			int _cnt52=0;
-			_loop52:
+			int _cnt47=0;
+			_loop47:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt52>=1 ) { break _loop52; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt47>=1 ) { break _loop47; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt52++;
+				_cnt47++;
 			} while (true);
 			}
 		}
@@ -333,7 +323,7 @@ tryAgain:
 		
 		match('"');
 		{
-		_loop55:
+		_loop50:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -373,11 +363,6 @@ tryAgain:
 				match('!');
 				break;
 			}
-			case '#':
-			{
-				match('#');
-				break;
-			}
 			case '(':
 			{
 				match('(');
@@ -397,7 +382,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop55;
+				break _loop50;
 			}
 			}
 		} while (true);
@@ -446,7 +431,7 @@ tryAgain:
 		}
 		}
 		{
-		_loop59:
+		_loop54:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -485,7 +470,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop59;
+				break _loop54;
 			}
 			}
 		} while (true);
@@ -589,51 +574,39 @@ tryAgain:
 		_returnToken = _token;
 	}
 	
-	public final void mLT(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+	public final void mRELATIONAL(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
-		_ttype = LT;
+		_ttype = RELATIONAL;
 		int _saveIndex;
 		
-		match('<');
-		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
-			_token = makeToken(_ttype);
-			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		switch ( LA(1)) {
+		case '!':
+		{
+			match("!=");
+			break;
 		}
-		_returnToken = _token;
-	}
-	
-	public final void mLTE(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
-		int _ttype; Token _token=null; int _begin=text.length();
-		_ttype = LTE;
-		int _saveIndex;
-		
-		match("<=");
-		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
-			_token = makeToken(_ttype);
-			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		case '|':
+		{
+			match("|=");
+			break;
 		}
-		_returnToken = _token;
-	}
-	
-	public final void mGT(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
-		int _ttype; Token _token=null; int _begin=text.length();
-		_ttype = GT;
-		int _saveIndex;
-		
-		match('>');
-		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
-			_token = makeToken(_ttype);
-			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		default:
+			if ((LA(1)=='<') && (LA(2)=='=')) {
+				match("<=");
+			}
+			else if ((LA(1)=='>') && (LA(2)=='=')) {
+				match(">=");
+			}
+			else if ((LA(1)=='<') && (true)) {
+				match('<');
+			}
+			else if ((LA(1)=='>') && (true)) {
+				match('>');
+			}
+		else {
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
-		_returnToken = _token;
-	}
-	
-	public final void mGTE(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
-		int _ttype; Token _token=null; int _begin=text.length();
-		_ttype = GTE;
-		int _saveIndex;
-		
-		match(">=");
+		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));

@@ -17,16 +17,23 @@ import antlr.collections.impl.BitSet;
 public class MyParser extends antlr.LLkParser       implements MyParserTokenTypes
  {
 
-   private Program  program;
-   private Command  command;
-   private int      writeType;
-   private String   element;
-   private Stack    stack;
-
-   public void init(){
-       program = new Program();
-       stack   = new Stack();
-   }
+    private Program program;
+    private Command command;
+    //math variables
+    private double  result;
+    private double  multiResult;
+    private double  varValue;
+    private String  operator;
+    // --
+    private String  element;
+    private Stack   stack;
+    private StringBuilder sb;
+   
+    public void init(){
+      program = new Program();
+      stack   = new Stack();
+      sb = new StringBuilder();
+    }
 
 protected MyParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
@@ -34,7 +41,7 @@ protected MyParser(TokenBuffer tokenBuf, int k) {
 }
 
 public MyParser(TokenBuffer tokenBuf) {
-  this(tokenBuf,1);
+  this(tokenBuf,2);
 }
 
 protected MyParser(TokenStream lexer, int k) {
@@ -43,11 +50,11 @@ protected MyParser(TokenStream lexer, int k) {
 }
 
 public MyParser(TokenStream lexer) {
-  this(lexer,1);
+  this(lexer,2);
 }
 
 public MyParser(ParserSharedInputState state) {
-  super(state,1);
+  super(state,2);
   tokenNames = _tokenNames;
 }
 
@@ -175,43 +182,46 @@ public MyParser(ParserSharedInputState state) {
 			switch ( LA(1)) {
 			case LITERAL_se:
 			{
-				ifStatment();
+				ifStatement();
 				break;
 			}
 			case LITERAL_enquanto:
 			{
-				whileStatment();
-				break;
-			}
-			case ID:
-			{
-				assignmentStatement();
+				whileStatement();
 				break;
 			}
 			case LITERAL_read:
 			case LITERAL_puts:
 			{
-				ioStatment();
+				ioStatement();
 				break;
 			}
 			default:
-			{
+				if ((LA(1)==ID) && (LA(2)==EQUALS)) {
+					assignmentStatement();
+				}
+				else if ((LA(1)==ID||LA(1)==NUM) && (_tokenSet_4.member(LA(2)))) {
+					expression();
+				}
+			else {
 				throw new NoViableAltException(LT(1), getFilename());
 			}
 			}
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_4);
+			recover(ex,_tokenSet_5);
 		}
 	}
 	
-	public final void ifStatment() throws RecognitionException, TokenStreamException {
+	public final void ifStatement() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
 			match(LITERAL_se);
 			match(AP);
+			expression();
+			match(RELATIONAL);
 			expression();
 			match(FP);
 			match(AC);
@@ -253,6 +263,7 @@ public MyParser(ParserSharedInputState state) {
 			case FC:
 			case LITERAL_se:
 			case LITERAL_enquanto:
+			case NUM:
 			case LITERAL_read:
 			case LITERAL_puts:
 			{
@@ -267,27 +278,63 @@ public MyParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_4);
+			recover(ex,_tokenSet_5);
 		}
 	}
 	
-	public final void whileStatment() throws RecognitionException, TokenStreamException {
+	public final void whileStatement() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
 			match(LITERAL_enquanto);
 			match(AP);
-			expression();
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			match(RELATIONAL);
+			{
+			switch ( LA(1)) {
+			case ID:
+			{
+				match(ID);
+				break;
+			}
+			case NUM:
+			{
+				match(NUM);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
 			match(FP);
 			match(AB);
 			{
-			_loop22:
+			_loop24:
 			do {
 				if ((_tokenSet_1.member(LA(1)))) {
 					statment();
 				}
 				else {
-					break _loop22;
+					break _loop24;
 				}
 				
 			} while (true);
@@ -296,7 +343,7 @@ public MyParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_4);
+			recover(ex,_tokenSet_5);
 		}
 	}
 	
@@ -305,20 +352,17 @@ public MyParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(ID);
+			
+			element = LT(0).getText(); 
+			command = new assignCommand();
+			
 			match(EQUALS);
 			{
 			switch ( LA(1)) {
 			case ID:
-			case AP:
-			case PLUS:
-			case MINUS:
-			{
-				expression();
-				break;
-			}
 			case NUM:
 			{
-				match(NUM);
+				expression();
 				break;
 			}
 			case STRING:
@@ -332,15 +376,33 @@ public MyParser(ParserSharedInputState state) {
 			}
 			}
 			}
+			
+			if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
+			((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
+			program.setNumberVarValue(element,result);
+			System.out.println("Resultado = " + result);
+			((assignCommand)command).buildExpression(element, sb.toString());
+			sb.setLength(0);
+			} else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
+			((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
+			program.setStringVarValue(element,LT(0).getText());
+			((assignCommand)command).buildString(element,LT(0).getText());
+			} else {
+			throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
+			}
+			
 			match(HT);
+			
+			program.addCommand(command);
+			
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_4);
+			recover(ex,_tokenSet_5);
 		}
 	}
 	
-	public final void ioStatment() throws RecognitionException, TokenStreamException {
+	public final void ioStatement() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
@@ -358,7 +420,25 @@ public MyParser(ParserSharedInputState state) {
 			{
 				match(LITERAL_puts);
 				match(AP);
-				expression();
+				{
+				switch ( LA(1)) {
+				case ID:
+				case NUM:
+				{
+					expression();
+					break;
+				}
+				case STRING:
+				{
+					match(STRING);
+					break;
+				}
+				default:
+				{
+					throw new NoViableAltException(LT(1), getFilename());
+				}
+				}
+				}
 				match(FP);
 				match(HT);
 				break;
@@ -371,7 +451,7 @@ public MyParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_4);
+			recover(ex,_tokenSet_5);
 		}
 	}
 	
@@ -379,36 +459,32 @@ public MyParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			addExpression();
+			multiplyExpression();
+			
+			result = multiResult;
+			
 			{
-			_loop40:
+			_loop30:
 			do {
-				if ((_tokenSet_5.member(LA(1)))) {
+				if ((LA(1)==PLUS||LA(1)==MINUS)) {
 					{
 					switch ( LA(1)) {
-					case EQUALS:
+					case PLUS:
 					{
-						match(EQUALS);
+						match(PLUS);
+						
+						operator = LT(0).getText();
+						sb.append(LT(0).getText());
+						
 						break;
 					}
-					case LT:
+					case MINUS:
 					{
-						match(LT);
-						break;
-					}
-					case LTE:
-					{
-						match(LTE);
-						break;
-					}
-					case GT:
-					{
-						match(GT);
-						break;
-					}
-					case GTE:
-					{
-						match(GTE);
+						match(MINUS);
+						
+						operator = LT(0).getText();
+						sb.append(LT(0).getText());
+						
 						break;
 					}
 					default:
@@ -417,10 +493,16 @@ public MyParser(ParserSharedInputState state) {
 					}
 					}
 					}
-					addExpression();
+					multiplyExpression();
+					
+					if(operator.equals("+"))
+					result+=multiResult;
+					else
+					result-=multiResult;
+					
 				}
 				else {
-					break _loop40;
+					break _loop30;
 				}
 				
 			} while (true);
@@ -432,21 +514,88 @@ public MyParser(ParserSharedInputState state) {
 		}
 	}
 	
+	public final void multiplyExpression() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			innerElement();
+			
+			multiResult = varValue;
+			
+			{
+			_loop34:
+			do {
+				if ((LA(1)==TIMES||LA(1)==DIV)) {
+					{
+					switch ( LA(1)) {
+					case TIMES:
+					{
+						match(TIMES);
+						
+						operator = LT(0).getText();
+						sb.append(LT(0).getText());
+						
+						break;
+					}
+					case DIV:
+					{
+						match(DIV);
+						
+						operator = LT(0).getText();
+						sb.append(LT(0).getText());
+						
+						break;
+					}
+					default:
+					{
+						throw new NoViableAltException(LT(1), getFilename());
+					}
+					}
+					}
+					innerElement();
+					
+					if(operator.equals("*"))
+					multiResult*=varValue;
+					else
+					multiResult/=varValue;
+					
+				}
+				else {
+					break _loop34;
+				}
+				
+			} while (true);
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_7);
+		}
+	}
+	
 	public final void innerElement() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
 			switch ( LA(1)) {
+			case NUM:
+			{
+				match(NUM);
+				
+				sb.append(LT(0).getText());
+				varValue = Double.parseDouble(LT(0).getText());
+				
+				break;
+			}
 			case ID:
 			{
 				match(ID);
-				break;
-			}
-			case AP:
-			{
-				match(AP);
-				expression();
-				match(FP);
+				
+				sb.append(LT(0).getText());
+				if(program.numberVarList.get(LT(0).getText())==null)
+				throw new RuntimeException("<<<<< Usou sem atribuir! >>>>>");
+				varValue = program.numberVarList.get(LT(0).getText());
+				
 				break;
 			}
 			default:
@@ -457,132 +606,7 @@ public MyParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
-		}
-	}
-	
-	public final void signExpression() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			{
-			_loop28:
-			do {
-				if ((LA(1)==PLUS||LA(1)==MINUS)) {
-					{
-					switch ( LA(1)) {
-					case PLUS:
-					{
-						match(PLUS);
-						break;
-					}
-					case MINUS:
-					{
-						match(MINUS);
-						break;
-					}
-					default:
-					{
-						throw new NoViableAltException(LT(1), getFilename());
-					}
-					}
-					}
-				}
-				else {
-					break _loop28;
-				}
-				
-			} while (true);
-			}
-			innerElement();
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
-		}
-	}
-	
-	public final void multiplyExpression() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			signExpression();
-			{
-			_loop32:
-			do {
-				if ((LA(1)==TIMES||LA(1)==DIV)) {
-					{
-					switch ( LA(1)) {
-					case TIMES:
-					{
-						match(TIMES);
-						break;
-					}
-					case DIV:
-					{
-						match(DIV);
-						break;
-					}
-					default:
-					{
-						throw new NoViableAltException(LT(1), getFilename());
-					}
-					}
-					}
-					signExpression();
-				}
-				else {
-					break _loop32;
-				}
-				
-			} while (true);
-			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
 			recover(ex,_tokenSet_8);
-		}
-	}
-	
-	public final void addExpression() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			multiplyExpression();
-			{
-			_loop36:
-			do {
-				if ((LA(1)==PLUS||LA(1)==MINUS)) {
-					{
-					switch ( LA(1)) {
-					case PLUS:
-					{
-						match(PLUS);
-						break;
-					}
-					case MINUS:
-					{
-						match(MINUS);
-						break;
-					}
-					default:
-					{
-						throw new NoViableAltException(LT(1), getFilename());
-					}
-					}
-					}
-					multiplyExpression();
-				}
-				else {
-					break _loop36;
-				}
-				
-			} while (true);
-			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_9);
 		}
 	}
 	
@@ -601,13 +625,14 @@ public MyParser(ParserSharedInputState state) {
 		"\"Number\"",
 		"COMMA",
 		"HT",
-		"NUM",
 		"STRING",
 		"\"se\"",
 		"AP",
+		"RELATIONAL",
 		"FP",
 		"\"do contrario\"",
 		"\"enquanto\"",
+		"NUM",
 		"AB",
 		"\"read\"",
 		"\"puts\"",
@@ -615,10 +640,6 @@ public MyParser(ParserSharedInputState state) {
 		"MINUS",
 		"TIMES",
 		"DIV",
-		"LT",
-		"LTE",
-		"GT",
-		"GTE",
 		"WS",
 		"COMMENT"
 	};
@@ -629,7 +650,7 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 6848544L, 0L};
+		long[] data = { 14172192L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
@@ -639,39 +660,34 @@ public MyParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 6850336L, 0L};
+		long[] data = { 14173984L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 6848800L, 0L};
+		long[] data = { 265830688L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
 	private static final long[] mk_tokenSet_5() {
-		long[] data = { 2013265984L, 0L};
+		long[] data = { 14172448L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 135168L, 0L};
+		long[] data = { 14373152L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 2139230272L, 0L};
+		long[] data = { 64704800L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
 	private static final long[] mk_tokenSet_8() {
-		long[] data = { 2038566976L, 0L};
+		long[] data = { 266031392L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
-	private static final long[] mk_tokenSet_9() {
-		long[] data = { 2013401152L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
 	
 	}

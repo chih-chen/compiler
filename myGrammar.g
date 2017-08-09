@@ -1,17 +1,28 @@
 // **************************** PARSER RULES *****************************
 class MyParser extends Parser;
 
-{
-   private Program  program;
-   private Command  command;
-   private int      writeType;
-   private String   element;
-   private Stack    stack;
+options {
+  k = 2;                     // two characters of lookahead
+}
 
-   public void init(){
-       program = new Program();
-       stack   = new Stack();
-   }
+{
+    private Program program;
+    private Command command;
+    //math variables
+    private double  result;
+    private double  multiResult;
+    private double  varValue;
+    private String  operator;
+    // --
+    private String  element;
+    private Stack   stack;
+    private StringBuilder sb;
+   
+    public void init(){
+      program = new Program();
+      stack   = new Stack();
+      sb = new StringBuilder();
+    }
 }
 
 program: "program" ID { 
@@ -41,27 +52,89 @@ declaration: ("String" | "Number") ID {
                     }
             ;  
 
-statment: ifStatment | whileStatment | assignmentStatement | ioStatment ;
+statment: ifStatement | whileStatement | assignmentStatement  | ioStatement | expression ;
 
-assignmentStatement: ID EQUALS (expression|NUM|STRING) HT ;
+assignmentStatement: ID { 
+                      element = LT(0).getText(); 
+                      command = new assignCommand();
+                     } 
+                     EQUALS (expression|STRING) {                         
+                      if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
+                        ((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
+                        program.setNumberVarValue(element,result);
+                        System.out.println("Resultado = " + result);
+                        ((assignCommand)command).buildExpression(element, sb.toString());
+                        sb.setLength(0);
+                      } else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
+                        ((assignCommand)command).changeMode(assignCommand.TYPE_STRING);
+                        program.setStringVarValue(element,LT(0).getText());
+                        ((assignCommand)command).buildString(element,LT(0).getText());
+                      } else {
+                        throw new RuntimeException ("<<<<< Usou sem declarar! >>>>>");
+                      }
+                     }
+                     HT {
+                          program.addCommand(command);
+                     };
 
-ifStatment: "se" AP expression FP AC (statment)* FC 
+ifStatement: "se" AP expression RELATIONAL expression FP AC (statment)* FC 
             ("do contrario" AC (statment)* FC)? ;
 
-whileStatment: "enquanto" AP expression FP AB (statment)* FC ;
+whileStatement: "enquanto" AP (ID|NUM) RELATIONAL (ID|NUM) FP AB (statment)* FC ;
 
-ioStatment: "read" AP ID FP HT |
-            "puts" AP expression FP HT ;
+ioStatement: "read" AP ID FP HT |
+             "puts" AP (expression|STRING) FP HT ;
 
-innerElement: ID | AP expression FP ;
+            //expression just do math
+            //soh passou aqui, nada de mais, o valor eh pego no inner
+expression: multiplyExpression {
+              result = multiResult;
+            }
+            (( PLUS {
+              operator = LT(0).getText();
+              sb.append(LT(0).getText());
+            } 
+            | MINUS {
+              operator = LT(0).getText();
+              sb.append(LT(0).getText());
+            } ) multiplyExpression {
+              if(operator.equals("+"))
+                result+=multiResult;
+              else
+                result-=multiResult;
+            })* 
+            ; 
 
-signExpression: ((PLUS|MINUS))* innerElement ;
+                    //soh passou aqui, nada de mais, o valor eh pego no inner
+multiplyExpression: innerElement {
+                      multiResult = varValue;
+                    }
+                    (( TIMES {
+                      operator = LT(0).getText();
+                      sb.append(LT(0).getText());
+                    } 
+                    | DIV {
+                      operator = LT(0).getText();
+                      sb.append(LT(0).getText());
+                    } ) innerElement {
+                      if(operator.equals("*"))
+                        multiResult*=varValue;
+                      else
+                        multiResult/=varValue;
+                    })* 
+                    ;
 
-multiplyExpression: signExpression ((TIMES|DIV) signExpression)* ;
-
-addExpression: multiplyExpression ((PLUS|MINUS) multiplyExpression)* ;
-
-expression: addExpression ((EQUALS|LT|LTE|GT|GTE) addExpression)* ;
+innerElement: NUM {
+                sb.append(LT(0).getText());
+                varValue = Double.parseDouble(LT(0).getText());
+              } 
+              | ID {
+                sb.append(LT(0).getText());
+                if(program.numberVarList.get(LT(0).getText())==null)
+                  throw new RuntimeException("<<<<< Usou sem atribuir! >>>>>");
+                varValue = program.numberVarList.get(LT(0).getText());
+              }   
+              ;
 
 // **************************** LEXER RULES *****************************
 
@@ -84,7 +157,7 @@ COMMENT : "//" (~('\n'|'\r'))* {$setType(Token.SKIP);} ;
 
 NUM     : ('0'..'9')+ ('.' ('0'..'9')+ )? ;
         
-STRING  : '"' ('a'..'z' | 'A'..'Z' | ' ' | '?' | '!' | '#' |'(' | ')' | '0'..'9')* '"' ;
+STRING  : '"' ('a'..'z' | 'A'..'Z' | ' ' | '?' | '!' |'(' | ')' | '0'..'9')* '"' ;
 
 //PRINT : "puts" ;  READ : "read" ;                             this causes nondeterminism
 
@@ -95,5 +168,6 @@ ID      options {testLiterals=true;}                            // hash table
 
 AC     : '{' ;   FC    : '}' ;   AP    : '('  ;   FP  : ')' ;
 HT     : '#' ;   COMMA : ',' ;
-EQUALS : '=' ;   LT    : '<' ;   LTE   : "<=" ;   GT  : '>' ;   GTE : ">=" ;  
+EQUALS : '=' ;   
+RELATIONAL: '<' | "<=" | '>' | ">=" | "!=" | "|=";
 PLUS   : '+' ;   MINUS : '-' ;   TIMES : '*'  ;   DIV : '/' ;
