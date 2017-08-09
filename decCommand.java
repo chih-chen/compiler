@@ -1,7 +1,7 @@
 public class decCommand extends Command {
   
-  public static final int TYPE_NUMBER = 1;
-  public static final int TYPE_STRING = 2;
+  public static final int TYPE_TEXT = 1;
+  public static final int TYPE_NUMBER = 2;
   
   private int mode;
   
