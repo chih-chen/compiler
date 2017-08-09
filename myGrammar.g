@@ -82,7 +82,12 @@ assignmentStatement: ID {
                       }
                      }
                      HT {
-                          program.addCommand(command);
+                          if (stack.isEmpty()){
+                   program.addCommand(command);
+                } else{
+                  Command tmp = stack.getTopElement();
+                  tmp.addCommand(command);
+                }
                      };
 
 ifStatement: "se" AP (ID | NUM) {

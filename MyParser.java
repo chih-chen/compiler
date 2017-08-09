@@ -480,7 +480,12 @@ public MyParser(ParserSharedInputState state) {
 			
 			match(HT);
 			
+			if (stack.isEmpty()){
 			program.addCommand(command);
+			} else{
+			Command tmp = stack.getTopElement();
+			tmp.addCommand(command);
+			}
 			
 		}
 		catch (RecognitionException ex) {
