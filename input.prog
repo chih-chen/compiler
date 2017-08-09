@@ -22,5 +22,20 @@ program MyProgram = {
     //c = "nada bem!"#  n tem funcao pilha ainda
     //z = 2#            n tem funcao pilha ainda
     puts(b)#
+    
+    enquanto(x>3){
+      read(q)#
+      
+      se(x >= y){
+        read(q)#
+      }
+      
+      puts(b)#
+    }
+  }
+  
+  enquanto(x>3){
+    read(q)#
+    puts(b)#
   }
 }

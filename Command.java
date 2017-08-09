@@ -1,4 +1,5 @@
-public abstract class Command {
-  public abstract void run();
-  public abstract String writeJava();
+public class Command {
+  public void run() {};
+  public String writeJava() { return null; };
+  public void addCommand(Command c) {};
 }

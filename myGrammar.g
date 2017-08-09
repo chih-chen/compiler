@@ -107,14 +107,39 @@ ifStatement: "se" AP (ID | NUM) {
                 if (stack.isEmpty()){
                   program.addCommand(cmd);
                 } else {
-                  ifCommand tmp = (ifCommand)stack.getTopElement();
+                  Command tmp = stack.getTopElement();
                   tmp.addCommand(cmd);
                 }
               }
               ;
 
 
-whileStatement: "enquanto" AP (ID|NUM) RELATIONAL (ID|NUM) FP AB (statment)* FC ;
+xwhileStatement: "xenquanto" AP (ID|NUM) RELATIONAL (ID|NUM) FP AB (statment)* FC ;
+
+whileStatement: "enquanto" AP (ID | NUM) {
+                logicalExpr.append(LT(0).getText());
+              }
+              RELATIONAL {
+                logicalExpr.append(LT(0).getText());
+              }
+              (ID|NUM) {
+                command = new whileCommand();
+                logicalExpr.append(LT(0).getText());
+                ((whileCommand)command).setLogicalExpr(logicalExpr.toString());
+                stack.push(command);
+                logicalExpr.setLength(0);
+              } FP AC (statment)* FC 
+              
+              {
+                Command cmd = stack.pop();
+                if (stack.isEmpty()){
+                  program.addCommand(cmd);
+                } else {
+                  Command tmp = stack.getTopElement();
+                  tmp.addCommand(cmd);
+                }
+              }
+              ;
 
 ioStatement: readCommand | putsCommand ;
              
@@ -135,7 +160,7 @@ readCommand: "read" {
                 program.addCommand(command);
               } else {
                 Command tmp = stack.getTopElement();
-                ((ifCommand)tmp).addCommand(command);
+                tmp.addCommand(command);
               }
             }
               ;
@@ -156,7 +181,7 @@ putsCommand: "puts" {
                    program.addCommand(command);
                 } else{
                   Command tmp = stack.getTopElement();
-                  ((ifCommand)tmp).addCommand(command);
+                  tmp.addCommand(command);
                 }
               } 
               ;
