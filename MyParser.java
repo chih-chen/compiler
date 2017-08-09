@@ -17,11 +17,16 @@ import antlr.collections.impl.BitSet;
 public class MyParser extends antlr.LLkParser       implements MyParserTokenTypes
  {
 
-    private Program  program;
-    private Command  command;
-    private int      result;
-    private String   element;
-    private Stack    stack;
+    private Program program;
+    private Command command;
+    //math variables
+    private double  result;
+    private double  multiResult;
+    private double  varValue;
+    private String  operator;
+    // --
+    private String  element;
+    private Stack   stack;
     private StringBuilder sb;
    
     public void init(){
@@ -372,9 +377,10 @@ public MyParser(ParserSharedInputState state) {
 			}
 			}
 			
-			if( !LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
+			if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
 			((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
-			program.setNumberVarValue(element,10.1);// TODO 10.1 must be changed to result of calculation
+			program.setNumberVarValue(element,result);
+			System.out.println("Resultado = " + result);
 			((assignCommand)command).buildExpression(element, sb.toString());
 			sb.setLength(0);
 			} else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
@@ -454,6 +460,9 @@ public MyParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			multiplyExpression();
+			
+			result = multiResult;
+			
 			{
 			_loop30:
 			do {
@@ -463,13 +472,19 @@ public MyParser(ParserSharedInputState state) {
 					case PLUS:
 					{
 						match(PLUS);
-						sb.append(LT(0).getText()); /*System.out.print(LT(0).getText());*/
+						
+						operator = LT(0).getText();
+						sb.append(LT(0).getText());
+						
 						break;
 					}
 					case MINUS:
 					{
 						match(MINUS);
+						
+						operator = LT(0).getText();
 						sb.append(LT(0).getText());
+						
 						break;
 					}
 					default:
@@ -479,6 +494,12 @@ public MyParser(ParserSharedInputState state) {
 					}
 					}
 					multiplyExpression();
+					
+					if(operator.equals("+"))
+					result+=multiResult;
+					else
+					result-=multiResult;
+					
 				}
 				else {
 					break _loop30;
@@ -498,6 +519,9 @@ public MyParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			innerElement();
+			
+			multiResult = varValue;
+			
 			{
 			_loop34:
 			do {
@@ -507,13 +531,19 @@ public MyParser(ParserSharedInputState state) {
 					case TIMES:
 					{
 						match(TIMES);
+						
+						operator = LT(0).getText();
 						sb.append(LT(0).getText());
+						
 						break;
 					}
 					case DIV:
 					{
 						match(DIV);
+						
+						operator = LT(0).getText();
 						sb.append(LT(0).getText());
+						
 						break;
 					}
 					default:
@@ -523,6 +553,12 @@ public MyParser(ParserSharedInputState state) {
 					}
 					}
 					innerElement();
+					
+					if(operator.equals("*"))
+					multiResult*=varValue;
+					else
+					multiResult/=varValue;
+					
 				}
 				else {
 					break _loop34;
@@ -545,13 +581,21 @@ public MyParser(ParserSharedInputState state) {
 			case NUM:
 			{
 				match(NUM);
+				
 				sb.append(LT(0).getText());
+				varValue = Double.parseDouble(LT(0).getText());
+				
 				break;
 			}
 			case ID:
 			{
 				match(ID);
+				
 				sb.append(LT(0).getText());
+				if(program.numberVarList.get(LT(0).getText())==null)
+				throw new RuntimeException("<<<<< Usou sem atribuir! >>>>>");
+				varValue = program.numberVarList.get(LT(0).getText());
+				
 				break;
 			}
 			default:
