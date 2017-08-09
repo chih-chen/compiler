@@ -90,6 +90,7 @@ assignmentStatement: ID {
                      }
                     };
 
+
 ifStatement: "se" AP (ID | NUM) {
                 logicalExpr.append(LT(0).getText());
               }
