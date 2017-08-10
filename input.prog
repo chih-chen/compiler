@@ -1,5 +1,5 @@
 program MyProgram = {
-  Number x, y, z, q#
+  Number x, y, z#
   String a, b, c#
   
   x = 10*20/5#
@@ -16,12 +16,11 @@ program MyProgram = {
     se(y<z){
       puts(a)#
       enquanto(x>3){
-        read(q)#
         z = 22#
         puts(b)#
       }
     } senao {
-      read(q)#
+      read(b);
     }
   } senao {
     c = "nada bem!"#
@@ -29,10 +28,10 @@ program MyProgram = {
     puts(b)#
     
     enquanto(x>3){
-      read(q)#
+      read(c)#
       
       se(x >= y){
-        read(q)#
+        read(a)#
       }
       
       puts(b)#
@@ -40,25 +39,17 @@ program MyProgram = {
   }
   
   faca {
-    se(q > 2) {
-      read(q)#  
-    }
     
     puts(b)#
-    q = 10#
     faca {
-      read(q)#
       //d = 20#
       puts(b)#
     }enquanto(x <= 7)#
   }enquanto(x <= 7)#
   
   enquanto(x>3){
-    read(q)#
     puts(b)#
-    enquanto(x>q){
-      read(q)#
-      q = 123#
+    enquanto(x>a){
       puts(b)#
     }
   }
@@ -66,11 +57,7 @@ program MyProgram = {
 
 // program Teste = {
 //   Number a,b,c,d#
-//   // a = 0 #
-//   // b = 0 #
-//   // c = 0 #
-//   //d = 0 #
-  
+
 //   puts("Programa Teste")#
 //   puts("Digite A")#
 //   read(a)#
