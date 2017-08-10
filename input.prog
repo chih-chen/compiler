@@ -63,3 +63,33 @@ program MyProgram = {
     }
   }
 }
+
+// program Teste = {
+//   Number a,b,c,d#
+//   // a = 0 #
+//   // b = 0 #
+//   // c = 0 #
+//   //d = 0 #
+  
+//   puts("Programa Teste")#
+//   puts("Digite A")#
+//   read(a)#
+  
+//   puts("Digite B")#
+//   read(b)#
+  
+//   se(a<b){
+//     c = a + b#
+//   } senao {
+//     c = a - b#
+//   }
+  
+//   puts("C e igual a ")#
+//   puts(c)#
+  
+//   d = c * a + b#
+  
+//   puts("D e igual a")#
+//   puts(d)#
+  
+// }

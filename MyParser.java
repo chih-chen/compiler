@@ -447,9 +447,7 @@ public MyParser(ParserSharedInputState state) {
 			match(LITERAL_faca);
 			
 			command = new doWhileCommand();
-			
 			stack.push(command);
-			
 			
 			match(AC);
 			{
@@ -567,7 +565,7 @@ public MyParser(ParserSharedInputState state) {
 			if(!LT(0).getText().contains("\"") && program.numberVarList.containsKey(element)) {
 			((assignCommand)command).changeMode(assignCommand.TYPE_NUMBER);
 			program.setNumberVarValue(element,result);
-			//System.out.println("Resultado = " + result);
+			System.out.println("Resultado = " + result);
 			((assignCommand)command).buildExpression(element, sb.toString());
 			sb.setLength(0);
 			} else if(LT(0).getText().contains("\"") && program.stringVarList.containsKey(element)) {
@@ -582,7 +580,7 @@ public MyParser(ParserSharedInputState state) {
 			
 			if (stack.isEmpty()){
 			program.addCommand(command);
-			} else{
+			} else {
 			Command tmp = stack.getTopElement();
 			tmp.addCommand(command);
 			}
@@ -851,7 +849,7 @@ public MyParser(ParserSharedInputState state) {
 				match(ID);
 				
 				sb.append(LT(0).getText());
-				if(program.numberVarList.get(LT(0).getText())==null)
+				if(!program.numberVarList.containsKey(LT(0).getText()) )
 				throw new RuntimeException("<<<<< Usou sem atribuir! >>>>>");
 				varValue = program.numberVarList.get(LT(0).getText());
 				

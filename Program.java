@@ -15,7 +15,7 @@ public class Program{
   }
   
   public static void addStringVariable(String var){
-    stringVarList.put(var,null);
+    stringVarList.put(var,"");
   }
   
   public static void setStringVarValue(String var, String value){
@@ -29,7 +29,7 @@ public class Program{
   }
   
   public static void addNumberVariable(String var){
-    numberVarList.put(var,null);
+    numberVarList.put(var,0.0);
   }
   
   public static void setNumberVarValue(String var, Double value){
